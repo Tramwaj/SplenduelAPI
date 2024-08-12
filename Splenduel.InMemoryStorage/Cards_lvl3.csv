@@ -1,0 +1,14 @@
+Colour;Resource;White;Blue;Green;Red;Black;Pink;Points;Crowns;Action
+Red;1;;5;3;;3;1;3;2;
+Blue;1;2;6;2;;;;4;;
+Multi;1;;;;8;;;3;;Turn
+Red;1;;;2;6;2;;4;;
+Black;1;3;;5;3;;1;3;2;
+Green;1;5;3;6;3;;1;3;2;
+Blue;1;3;;3;;5;1;3;2;
+Grey;0;8;;;;;;6;;
+White;1;6;2;;;2;;4;;
+Green;1;;2;6;2;;;4;;
+Multi;1;;;;;8;;;3;
+White;1;;3;;5;3;1;3;2;
+Black;1;2;;;2;6;;4;;
