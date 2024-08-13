@@ -20,9 +20,13 @@ namespace Splenduel.Core.Game.Model
             for (int i = 0; i < 5; i++)
             {
                 CoinsOnBoard[i] = new ColourEnum[5];
+                for (int j = 0; j < 5; j++)
+                {
+                    CoinsOnBoard[i][j] = ColourEnum.Grey;
+                }
             }
             _coinsInBag = new();
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 4; i++)
             {
                 _coinsInBag.Add(ColourEnum.White);
                 _coinsInBag.Add(ColourEnum.Blue);
@@ -55,15 +59,15 @@ namespace Splenduel.Core.Game.Model
                 drawOneifNeeded(i, j);
             while (_coinsInBag.Count > 0)
             {
-                if (direction == "left") j--;
-                if (direction == "up") i--;
-                if (direction == "right") j++;
-                if (direction == "down") i++;
                 drawOneifNeeded(i, j);
                 if (counter == 1 || counter == 9) direction = "up";
                 if (counter == 2 || counter == 12) direction = "right";
                 if (counter == 4 || counter == 16) direction = "down";
                 if (counter == 6 || counter == 20) direction = "left";
+                if (direction == "left") j--;
+                if (direction == "up") i--;
+                if (direction == "right") j++;
+                if (direction == "down") i++;
                 counter++;
             }
             void drawOneifNeeded(int i, int j)
