@@ -63,13 +63,14 @@ namespace SplenduelAPI.Controllers
         [Authorize]
         public async Task<ActionResult<Guid>> AcceptGameInvite(Guid id)
         {
+            Guid result;
             try
             {
-                var result = await this._homeManager.AcceptGameInvite(id);
+                result = await this._homeManager.AcceptGameInvite(id);
                 if (result == Guid.Empty) return BadRequest("Couldn't accept invite");
             }
             catch (Exception ex) { return BadRequest(ex); }
-            return Ok(id);
+            return Ok(result);
         }
         [HttpPost("rejectInvite")]
         [HttpPost("{id:Guid}")]
