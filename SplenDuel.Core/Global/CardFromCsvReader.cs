@@ -9,7 +9,7 @@ namespace Splenduel.Core.Global
 {
     public static class CardFromCsvReader
     {
-        public static Card Read(string cardCsv, int id)
+        public static Card Read(string cardCsv, int id, int level)
         {
             string[] props = cardCsv.Split(';');
             Enum.TryParse(props[0], out ColourEnum cardcolour);
@@ -26,7 +26,7 @@ namespace Splenduel.Core.Global
             if (!string.IsNullOrEmpty(props[10])) 
                 if (!Enum.TryParse(props[10], out action))
                     action = CardActionEnum.None;
-            return new Card(id, cardcolour, points, miningPower, crowns, cardCost, action);
+            return new Card(id, level, cardcolour, points, miningPower, crowns, cardCost, action);
         }
         private static int CsvValueToInt(string val)
         {

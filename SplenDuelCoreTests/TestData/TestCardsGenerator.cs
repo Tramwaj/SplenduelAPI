@@ -20,7 +20,7 @@ namespace SplenDuelCoreTests.TestData
 
         public TestCardsGenerator()
         {
-            Cards = _cardCsv.Select((x, i) => CardFromCsvReader.Read(x, i)).ToList();
+            Cards = _cardCsv.Select((x, i) => CardFromCsvReader.Read(x, i, 1)).ToList();
         }
     }
 }

@@ -11,12 +11,12 @@ namespace Splenduel.Core.Game.Services
     {
         private List<Card> _level1Deck = new List<Card>
         {
-            new Card(0, ColourEnum.Red, 0, 1, 0, new CardCost(0,0,0,0,3,0)),
-            new Card(1, ColourEnum.Green, 0,1,0,new CardCost(0,0,0,2,2,1)),
-            new Card(2, ColourEnum.Green, 0, 1,0,new CardCost(1,1,0,1,1,0)),
-            new Card(3, ColourEnum.Grey, 3,0,0,new CardCost(0,0,0,4,0,1)),
-            new Card(4, ColourEnum.Red, 0, 1, 0, new CardCost(1,1,1,0,1,0)),
-            new Card(5, ColourEnum.Red, 0, 1, 0, new CardCost(2,0,0,0,2,1 ))
+            new Card(0,1, ColourEnum.Red, 0, 1, 0, new CardCost(0,0,0,0,3,0)),
+            new Card(1,1, ColourEnum.Green, 0,1,0,new CardCost(0,0,0,2,2,1)),
+            new Card(2,1, ColourEnum.Green, 0, 1,0,new CardCost(1,1,0,1,1,0)),
+            new Card(3,1, ColourEnum.Grey, 3,0,0,new CardCost(0,0,0,4,0,1)),
+            new Card(4,1, ColourEnum.Red, 0, 1, 0, new CardCost(1,1,1,0,1,0)),
+            new Card(5,1, ColourEnum.Red, 0, 1, 0, new CardCost(2,0,0,0,2,1 ))
         };
         private List<Card> _level1Exposed = new();
         public CardGenerator()

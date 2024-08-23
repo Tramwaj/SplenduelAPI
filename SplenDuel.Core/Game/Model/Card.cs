@@ -9,9 +9,10 @@ namespace Splenduel.Core.Game.Model
         {
             
         }
-        public Card(int id, ColourEnum colour, int points, int miningPower, int crowns, CardCost cost, CardActionEnum cardAction= CardActionEnum.None)
+        public Card(int id, int level, ColourEnum colour, int points, int miningPower, int crowns, CardCost cost, CardActionEnum cardAction= CardActionEnum.None)
         {
             Id = id;
+            Level = level;
             Colour = colour;
             Points = points;
             MiningPower = miningPower;
@@ -21,15 +22,16 @@ namespace Splenduel.Core.Game.Model
         }
         static Card Blank()
         {
-            return new Card(0, ColourEnum.Grey, 0, 0, 0, null);
+            return new Card(0,0, ColourEnum.Grey, 0, 0, 0, null);
 
         }
         public bool IsEqualTo(Card card)
         {
-            return Colour==card.Colour && Points==card.Points && MiningPower==card.MiningPower && Crowns==card.Crowns && Cost==card.Cost && Action==card.Action;
+            return Colour==card.Colour && Level==card.Level && Points==card.Points && MiningPower==card.MiningPower && Crowns==card.Crowns && Cost==card.Cost && Action==card.Action;
         }
 
         public int Id { get; set; }
+        public int Level { get; set; }
         public ColourEnum Colour { get; set; }
         public int Points { get; set; }
         public int MiningPower { get; set; }
