@@ -1,7 +1,7 @@
 ﻿public enum CardActionEnum
 {
-    Turn,
-    Pickup,
+    ExtraTurn,
+    CoinPickup,
     Steal,
     Scroll,
     None
