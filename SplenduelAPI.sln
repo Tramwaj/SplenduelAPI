@@ -15,7 +15,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextStorage", "TextStorage\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TextStorage.Tests", "TextStorage.Tests\TextStorage.Tests.csproj", "{1320BEB5-0FE2-40B6-8E77-38D9B102A0FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splenduel.InMemoryStorage", "Splenduel.InMemoryStorage\Splenduel.InMemoryStorage.csproj", "{215AD7B6-A857-4F7C-A9F4-C597AE8EA6F8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Splenduel.InMemoryStorage", "Splenduel.InMemoryStorage\Splenduel.InMemoryStorage.csproj", "{215AD7B6-A857-4F7C-A9F4-C597AE8EA6F8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splenduel.Interfaces", "Splendor.Interfaces\Splenduel.Interfaces.csproj", "{E92F80B3-7314-465B-92C4-28D55B5FCCCF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +53,10 @@ Global
 		{215AD7B6-A857-4F7C-A9F4-C597AE8EA6F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{215AD7B6-A857-4F7C-A9F4-C597AE8EA6F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{215AD7B6-A857-4F7C-A9F4-C597AE8EA6F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E92F80B3-7314-465B-92C4-28D55B5FCCCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E92F80B3-7314-465B-92C4-28D55B5FCCCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E92F80B3-7314-465B-92C4-28D55B5FCCCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E92F80B3-7314-465B-92C4-28D55B5FCCCF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

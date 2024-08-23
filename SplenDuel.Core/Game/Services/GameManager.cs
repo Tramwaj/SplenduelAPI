@@ -1,6 +1,9 @@
 ﻿using Splenduel.Core.Game.Model;
 using Splenduel.Core.Game.Store;
 using Splenduel.Core.Global;
+using Splenduel.Core.Mappers;
+using Splenduel.Interfaces.DTOs;
+using Splenduel.Interfaces.VMs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +23,7 @@ namespace Splenduel.Core.Game.Services
             _gameCreator = gameCreator;
         }
 
-        public async Task<GameState> GetGameData(Guid id, string PlayerName)
+        public async Task<GameStateVM> GetGameData(Guid id, string PlayerName)
         {
             var gameState = await _store.GetGameState(id);
             if (gameState == null)
@@ -36,8 +39,12 @@ namespace Splenduel.Core.Game.Services
                     throw;
                 }
             }
+            return (await gameState.PerPlayer(PlayerName)).MapToVM();
+        }
 
-            return await gameState.PerPlayer(PlayerName);
+        public async Task<GameStateVM> ResolveAction(ActionDTO action, string playerName)
+        {
+            throw new NotImplementedException();
         }
     }
 }
