@@ -11,7 +11,7 @@ namespace Splenduel.Core.Home.Interfaces
     {
         public string UserName { get; set; }
         public ICollection<GameInvite> OwnInvites { get; set; }
-        public ICollection<GameInvite> Invitations { get; set; }
+        public ICollection<GameInvite> Invites { get; set; }
         public ICollection<Model.Duel> CurrentDuels { get; set; }
         public ICollection<Model.Duel> PastDuels { get; set; }
     }
