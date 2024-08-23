@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Splenduel.InMemoryStorage
@@ -23,23 +22,23 @@ namespace Splenduel.InMemoryStorage
         }
 
         public async Task<string[]> GetAllCardsCsvFromLevel(int lvl)
-        {            
-            return await CardsImporter.GetAllFromLevel(lvl);            
+        {
+            return await CardsImporter.GetAllFromLevel(lvl);
         }
 
         public async Task<GameState> GetGameState(Guid id)
         {
             if (!_gameStates.ContainsKey(id)) return null;
-           
-                var gamestate = JsonSerializer.Deserialize<GameState>(serializedGameState);
-                return gamestate;
-            
+
+            var gamestate = _gameStates[id].Last();
+            return gamestate;
+
         }
 
         public async Task<DefaultResponse> UpdateGame(GameState gameState)
         {
-            if (!_gameStates.ContainsKey(gameState.GameId)) return DefaultResponse.Nok("GameID not found");   
-            _gameStates[gameState.GameId].Add(JsonSerializer.Serialize(gameState));
+            if (!_gameStates.ContainsKey(gameState.GameId)) return DefaultResponse.Nok("GameID not found");
+            _gameStates[gameState.GameId].Add(gameState);
             return DefaultResponse.ok;
         }
     }
