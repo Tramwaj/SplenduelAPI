@@ -12,12 +12,14 @@ namespace SplenduelAPI.Controllers
     [Route("[controller]")]
     public class GameController : ControllerBase
     {
-        readonly GameManager _gameManager;
+        private readonly GameManager _gameManager;
+        private readonly IHubContext<GameHub> _gameHub;
 
         //todo: remove dependency from Model (interfaces)
-        public GameController(GameManager gameManager)
+        public GameController(GameManager gameManager, IHubContext<GameHub> gameHub)
         {
             _gameManager = gameManager;
+            _gameHub = gameHub;
         }
 
         [HttpGet("getGameState")]

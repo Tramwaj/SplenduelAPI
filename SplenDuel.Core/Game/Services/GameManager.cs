@@ -16,11 +16,13 @@ namespace Splenduel.Core.Game.Services
     {
         private IGameStore _store;
         private GameCreator _gameCreator;
+        private ActionResolver _actionResolver;
 
-        public GameManager(IGameStore store, GameCreator gameCreator)
+        public GameManager(IGameStore store, GameCreator gameCreator, ActionResolver actionResolver)
         {
             _store = store;
             _gameCreator = gameCreator;
+            _actionResolver = actionResolver;
         }
 
         public async Task<GameStateVM> GetGameData(Guid id, string PlayerName)

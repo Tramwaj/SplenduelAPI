@@ -9,6 +9,8 @@ using Splenduel.Core.Home;
 using Splenduel.Core.Home.Interfaces;
 using Splenduel.Core.Home.Store;
 using Splenduel.InMemoryStorage;
+using Splenduel.Interfaces.Services;
+using SplenduelAPI.Hubs;
 using System.Text;
 using TextStorage;
 
@@ -23,10 +25,11 @@ builder.Services.AddEndpointsApiExplorer();
 
 //todo: setup cors properly
 builder.Services.AddCors(options => options
-            .AddDefaultPolicy(policy => policy.AllowAnyOrigin()
+            .AddPolicy("AllowLocalhost3000", policy => policy.WithOrigins("http://localhost:3000")
+                                               .AllowAnyHeader()
                                               .AllowAnyMethod()
-                                              .AllowAnyHeader()));
-                                              //.WithOrigins("http://localhost:3000")));
+                                              .AllowCredentials()));
+//.WithOrigins("http://localhost:3000")));
 
 //todo: configure jwt properly
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -34,10 +37,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 {
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        ValidIssuer = builder.Configuration.GetValue<string>("JwtSettings:ValidIssuer"),                        
+                        ValidIssuer = builder.Configuration.GetValue<string>("JwtSettings:ValidIssuer"),
                         ValidAudience = builder.Configuration.GetValue<string>("JwtSettings:ValidAudience"),
                         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("JwtSettings:Secret")!)),
                         SaveSigninToken = true
+                    };
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                            (path.StartsWithSegments("/gameHub")))
+                            {
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        }
                     };
                 });
 
@@ -46,12 +63,13 @@ builder.Services.AddTransient<IHomeManager, HomeManager>();
 builder.Services.AddTransient<GameManager, GameManager>();
 builder.Services.AddTransient<GameCreator, GameCreator>();
 builder.Services.AddSingleton<IHomeStore, HomeInMemory>();
+builder.Services.AddTransient<IGameInfoSender, GameHubConnector>();
 builder.Services.AddSingleton<IUserStore, UserInMemory>();
 builder.Services.AddSingleton<IGameStore, GameInMemory>();
 
 //builder.Services.AddSingleton<INotificationSink, NotificationService> ();
 //builder.Services.AddHostedService(sp => (NotificationService)sp.GetService<INotificationSink>());
-//builder.Services.AddSignalR();
+builder.Services.AddSignalR();
 
 
 var app = builder.Build();

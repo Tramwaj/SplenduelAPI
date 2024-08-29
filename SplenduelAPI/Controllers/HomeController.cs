@@ -8,6 +8,7 @@ using Splenduel.Core.Global;
 using Splenduel.Core.Home;
 using Splenduel.Core.Home.Interfaces;
 using Splenduel.Core.Home.Model;
+using SplenduelAPI.Hubs;
 using System.Security.Claims;
 
 namespace SplenduelAPI.Controllers
