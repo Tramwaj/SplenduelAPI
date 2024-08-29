@@ -39,6 +39,26 @@ namespace Splenduel.Core.Game.Model
             if (this.Coins.Keys.Any(x => x == coin)) this.Coins[coin]++;
             else this.Coins.Add(coin, 1);
         }
+        public async Task AddCoins(ICollection<ColourEnum> coins)
+        {
+            foreach (var coin in coins)
+            {
+                await AddCoin(coin);
+            }
+        }
+        public async Task<DefaultResponse> DropCoins(ICollection<ColourEnum> coins)
+        {
+            foreach(var coin in coins)
+            {
+                if (this.Coins.TryGetValue(coin, out int coinValue))
+                {
+                    if (coinValue < 1) return DefaultResponse.Nok("Player does not have enough coins to drop!");
+                    this.Coins[coin]--;
+                }
+                else return DefaultResponse.Nok("Player does not have enough coins to drop!");
+            }
+            return DefaultResponse.Ok(coins.Count().ToString());
+        }
         public bool CanAfford(IDictionary<ColourEnum, int> cost, out IDictionary<ColourEnum, int> remainder)
         {
             remainder = this.Coins.ToDictionary();
