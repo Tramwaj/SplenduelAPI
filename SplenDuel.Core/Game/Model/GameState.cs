@@ -17,6 +17,22 @@ namespace Splenduel.Core.Game.Model
         public Player Player1 { get; set; }
         public Player Player2 { get; set; }
         public string LastAction { get; set; }
+        public string CurrentPlayerName
+        {
+            get
+            {
+                if (Player1Turn) return Player1.Name;
+                return Player2.Name;
+            }
+        }
+        public PlayerBoard CurrentPlayerBoard
+        {
+            get
+            {
+                if (Player1Turn) return Board.Player1Board;
+                return Board.Player2Board;
+            }
+        }
 
         public GameState()
         {

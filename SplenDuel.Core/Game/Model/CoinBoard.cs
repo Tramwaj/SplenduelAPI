@@ -5,18 +5,17 @@ namespace Splenduel.Core.Game.Model
     public class CoinBoard
     {
         private readonly Random random = new Random();
-        public ColourEnum[][] CoinsOnBoard { get; private set; }
         private List<ColourEnum> _coinsInBag;
         private int _initialScrollCount;
+
+        public ColourEnum[][] CoinsOnBoard { get; private set; }
         public int ScrollCount { get; private set; }
         public CoinBoard()
         {
             
         }
-        public CoinBoard(int initialScrollCount = 3)
+        private void ClearTheBoard()
         {
-            _initialScrollCount = initialScrollCount;
-            CoinsOnBoard = new ColourEnum[5][];
             for (int i = 0; i < 5; i++)
             {
                 CoinsOnBoard[i] = new ColourEnum[5];
@@ -25,6 +24,12 @@ namespace Splenduel.Core.Game.Model
                     CoinsOnBoard[i][j] = ColourEnum.Grey;
                 }
             }
+        }
+        public CoinBoard(int initialScrollCount = 3)
+        {
+            _initialScrollCount = initialScrollCount;
+            CoinsOnBoard = new ColourEnum[5][];
+            ClearTheBoard();
             _coinsInBag = new();
             for (int i = 0; i < 4; i++)
             {
@@ -42,11 +47,28 @@ namespace Splenduel.Core.Game.Model
             _coinsInBag.Add(ColourEnum.Gold);
             FillTheBoard();
         }
+        private void PackTheCoins()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                for (int j = 0; j < 5; j++)
+                {
+                    if (CoinsOnBoard[i][j]!=ColourEnum.Grey)
+                        _coinsInBag.Add(CoinsOnBoard[i][j]);
+                    CoinsOnBoard[i][j] = ColourEnum.Grey;
+                }
+            }
+        }
         public CoinBoard(ColourEnum[][] coinsOnBoard, List<ColourEnum> coinsInBag, int scrollCount)
         {
             ScrollCount = scrollCount;
             _coinsInBag = coinsInBag;
             CoinsOnBoard = coinsOnBoard;
+        }
+        public void ShuffleBoard()
+        {
+            PackTheCoins();
+            FillTheBoard();
         }
 
         public void FillTheBoard()
