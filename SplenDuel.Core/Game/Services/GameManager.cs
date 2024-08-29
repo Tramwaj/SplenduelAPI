@@ -46,7 +46,19 @@ namespace Splenduel.Core.Game.Services
 
         public async Task<GameStateVM> ResolveAction(ActionDTO action, string playerName)
         {
-            throw new NotImplementedException();
+            var previousGameState = await _store.GetGameState(action.GameId);
+            GameState NewGameState = null;
+            try
+            {
+                if (previousGameState == null) throw new ApplicationException("Game not found");
+                if (previousGameState.CurrentPlayerName != playerName) throw new ApplicationException("Not your turn");
+                var newGameState = _actionResolver.ResolveAction(action, previousGameState, playerName);
+                return null;// (await newGameState.PerPlayer(playerName)).MapToVM();
+            }
+            catch
+            {
+                throw;
+            }
         }
     }
 }

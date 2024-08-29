@@ -62,6 +62,7 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IHomeManager, HomeManager>();
 builder.Services.AddTransient<GameManager, GameManager>();
 builder.Services.AddTransient<GameCreator, GameCreator>();
+builder.Services.AddTransient<ActionResolver, ActionResolver>();
 builder.Services.AddSingleton<IHomeStore, HomeInMemory>();
 builder.Services.AddTransient<IGameInfoSender, GameHubConnector>();
 builder.Services.AddSingleton<IUserStore, UserInMemory>();
@@ -78,7 +79,7 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-   // app.UseSwagger();
+    // app.UseSwagger();
     //app.UseSwaggerUI();
 }
 
@@ -86,7 +87,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseRouting();
 
-app.UseCors();
+app.UseCors("AllowLocalhost3000");
 
 app.UseAuthentication();
 
@@ -97,6 +98,7 @@ app.MapControllers();
 //app.UseExceptionHandler( fgh fhfgh fgh);
 
 //app.UseWebSockets();
+app.MapHub<GameHub>("/gamehub");
 
 app.Run();
 

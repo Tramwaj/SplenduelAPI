@@ -8,18 +8,17 @@ namespace Splenduel.Interfaces.DTOs
 {
     public class ActionDTO
     {
-        public string ActionType { get; set; }
-        public string PlayerName { get; set; }
+        public string Type { get; set; }
         public Guid GameId { get; set; }
-        public object Param1 { get; set; }
-        public object? Param2 { get; set; }
-
-        public ActionDTO(string actionType, string playerName, object param1, object? param2 = null)
+        public object Payload { get; set; }
+        public ActionDTO()
         {
-            PlayerName= playerName;
-            ActionType = actionType;
-            Param1 = param1;
-            Param2 = param2;
+            
+        }
+        public ActionDTO(string type, object parameters)
+        {
+            Type = type;
+            Payload = parameters;
         }
     }
 }

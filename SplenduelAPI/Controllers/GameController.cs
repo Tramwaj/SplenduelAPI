@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Splenduel.Core.Game.Model;
 using Splenduel.Core.Game.Services;
 using Splenduel.Interfaces.DTOs;
 using Splenduel.Interfaces.VMs;
+using SplenduelAPI.Hubs;
 using System.Security.Claims;
 
 namespace SplenduelAPI.Controllers
@@ -36,17 +38,18 @@ namespace SplenduelAPI.Controllers
             }
             catch (Exception ex) { return BadRequest(ex); }
         }
-        [HttpPost("sendAction")]
+        [HttpPost("SendAction")]
         [Authorize]
-        public async Task<ActionResult<GameStateVM>> SendAction([FromBody] ActionDTO action)
+        public async Task<ActionResult> SendAction([FromBody] ActionFromJson action)
         {
-            string playerName = User.FindFirst(ClaimTypes.Name)?.Value;
+            string? playerName = User.FindFirst(ClaimTypes.Name)?.Value;
+            var actionn = action.Action;
             //string playerId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(playerName) ) return BadRequest("Something wrong with your name?");
+            if (string.IsNullOrEmpty(playerName)) return BadRequest("Something wrong with your name?");
             try
             {
-                var gameData = await _gameManager.ResolveAction(action, playerName);
-                return Ok(gameData);
+                var gameData = await _gameManager.ResolveAction(actionn, playerName);
+                return Ok();
             }
             catch (Exception ex) { return BadRequest(ex); }
         }
