@@ -12,7 +12,6 @@ namespace Splenduel.Core.Game.Model
         public int ScrollCount { get; private set; }
         public CoinBoard()
         {
-            
         }
         private void ClearTheBoard()
         {
@@ -25,9 +24,10 @@ namespace Splenduel.Core.Game.Model
                 }
             }
         }
-        public CoinBoard(int initialScrollCount = 3)
+        public CoinBoard(int initialScrollCount = 2)
         {
             _initialScrollCount = initialScrollCount;
+            ScrollCount = initialScrollCount;
             CoinsOnBoard = new ColourEnum[5][];
             ClearTheBoard();
             _coinsInBag = new();
@@ -53,7 +53,7 @@ namespace Splenduel.Core.Game.Model
             {
                 for (int j = 0; j < 5; j++)
                 {
-                    if (CoinsOnBoard[i][j]!=ColourEnum.Grey)
+                    if (CoinsOnBoard[i][j] != ColourEnum.Grey)
                         _coinsInBag.Add(CoinsOnBoard[i][j]);
                     CoinsOnBoard[i][j] = ColourEnum.Grey;
                 }
