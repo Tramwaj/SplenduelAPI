@@ -17,7 +17,7 @@ namespace Splenduel.Core.Game.Model
         public Player Player1 { get; set; }
         public Player Player2 { get; set; }
         public string LastAction { get; set; }
-        public string CurrentPlayerName
+        public string ActivePlayerName
         {
             get
             {
@@ -25,12 +25,28 @@ namespace Splenduel.Core.Game.Model
                 return Player2.Name;
             }
         }
-        public PlayerBoard CurrentPlayerBoard
+        public string NotActivePlayerName
+        {
+            get
+            {
+                if (Player1Turn) return Player2.Name;
+                return Player1.Name;
+            }
+        }
+        public PlayerBoard ActivePlayerBoard
         {
             get
             {
                 if (Player1Turn) return Board.Player1Board;
                 return Board.Player2Board;
+            }
+        }
+        public PlayerBoard NotActivePlayerBoard
+        {
+            get
+            {
+                if (Player1Turn) return Board.Player2Board;
+                return Board.Player1Board;
             }
         }
 

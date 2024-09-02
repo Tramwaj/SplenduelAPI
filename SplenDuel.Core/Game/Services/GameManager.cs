@@ -51,7 +51,7 @@ namespace Splenduel.Core.Game.Services
             try
             {
                 if (previousGameState == null) throw new ApplicationException("Game not found");
-                if (previousGameState.CurrentPlayerName != playerName) throw new ApplicationException("Not your turn");
+                if (previousGameState.ActivePlayerName != playerName) throw new ApplicationException("Not your turn");
                 var newGameState = _actionResolver.ResolveAction(action, previousGameState, playerName);
                 return null;// (await newGameState.PerPlayer(playerName)).MapToVM();
             }
