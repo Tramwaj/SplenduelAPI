@@ -6,10 +6,10 @@
         public string? Error { get; set; }
         public object Object { get; set; }
 
-        public DefaultResponse(bool success, string? error="")
+        public DefaultResponse(bool success, string? message="")
         {
             Success = success;
-            Error = error;
+            Error = message;
         }
         public DefaultResponse(bool success, object result) : this(success)
         {

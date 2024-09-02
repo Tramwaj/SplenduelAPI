@@ -63,8 +63,8 @@ namespace Splenduel.Core.Home
             vm.OwnInvites = invites.Where(x => x.Inviter == user).ToList();
             vm.Invites = invites.Where(x => x.Invitee == user).ToList();
             var matches = await _homeStore.GetMatches(user);
-            vm.CurrentDuels = matches.Where(x => x.EndingTime == null).ToList();
-            vm.PastDuels = matches.Where(x => x.EndingTime != null).ToList();
+            vm.CurrentDuels = matches.Where(x => x.EndTime == null).ToList();
+            vm.PastDuels = matches.Where(x => x.EndTime != null).ToList();
             return vm;
         }
         

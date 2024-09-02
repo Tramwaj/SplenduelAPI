@@ -1,5 +1,6 @@
 ﻿using Splenduel.Core.Game.Model.Extensions;
 using Splenduel.Core.Global;
+using Splenduel.Core.Utils;
 using System.Linq;
 
 namespace Splenduel.Core.Game.Model
@@ -8,15 +9,16 @@ namespace Splenduel.Core.Game.Model
     {
         public ICollection<Card> HiddenCards { get; private set; } = new List<Card>();
         public int ScrollsCount { get; set; } = 0;
-        public IDictionary<ColourEnum,int> PointsByColour { get;private set; } = new Dictionary<ColourEnum,int>();
+        public IDictionary<ColourEnum,int> PointsByColour { get;private set; } = MapColourDictionaryFunctions.CreateColourEnumZeroDictionary();
 
         public int TotalPoints => PointsByColour.Values.Sum();
         public int Crowns { get; private set; } = 0;
         public ICollection<Card> OwnedCards { get; private set; } = new List<Card>();
-        public IDictionary<ColourEnum, int> MiningValues { get; private set; } = new Dictionary<ColourEnum, int>();
-        public IDictionary<ColourEnum, int> Coins { get; private set; } = new Dictionary<ColourEnum, int>();
+        public IDictionary<ColourEnum, int> MiningValues { get; private set; } = MapColourDictionaryFunctions.CreateColourEnumZeroDictionary();
+        public IDictionary<ColourEnum, int> Coins { get; private set; } = MapColourDictionaryFunctions.CreateColourEnumZeroDictionary();
 
         public int HiddenCardsCount => HiddenCards.Count();
+               
 
         public PlayerBoard(){}
         public PlayerBoard(bool playerStarting=false)

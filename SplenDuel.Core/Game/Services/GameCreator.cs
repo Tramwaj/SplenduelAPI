@@ -57,7 +57,7 @@ namespace Splenduel.Core.Game.Services
                 var cardLevel2 = new CardLevel(lvl2Cards, 4);
                 var lvl3Cards = (await _gameStore.GetAllCardsCsvFromLevel(3)).Select((x, i) => CardFromCsvReader.Read(x, i+200, 3)).ToList();
                 var cardLevel3 = new CardLevel(lvl3Cards, 3);
-                var coinBoard = new CoinBoard(3);
+                var coinBoard = new CoinBoard(2);
                 var player1Board = new PlayerBoard(true);
                 var player2Board = new PlayerBoard(false);
                 return new Board(cardLevel1, cardLevel2, cardLevel3, coinBoard, player1Board, player2Board);

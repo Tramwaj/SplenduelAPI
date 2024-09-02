@@ -49,7 +49,7 @@ namespace Splenduel.Core.Game.Services
             if (coinBoardResponse.Success)
             {
                 var coins = takeCoinRequest.Select(x => x.colour).ToList();
-                await gs.CurrentPlayerBoard.AddCoins(coins);
+                await gs.ActivePlayerBoard.AddCoins(coins);
                 gs.LastAction = $"{playerName} took coins";
             }
             else gs.LastAction = $"{playerName} did not take coins";
@@ -78,13 +78,28 @@ namespace Splenduel.Core.Game.Services
             string lastActionEnd;
             if (coinBoardResponse.Success)
             {
-                gs.CurrentPlayerBoard.ScrollsCount++;
-                lastActionEnd = $"and took a scroll";
+                gs.NotActivePlayerBoard.ScrollsCount++;
+                lastActionEnd = $"and opponent took a scroll from board";
             }
-            else lastActionEnd = $"and did not take a scroll(no scrolls left)";
+            else
+            {
+                if (gs.ActivePlayerBoard.ScrollsCount > 0)
+                {
+                    gs.ActivePlayerBoard.ScrollsCount--;
+                    gs.NotActivePlayerBoard.ScrollsCount++;
+                    lastActionEnd = $"and gave opponent a scroll";
+                    await _hub.SendPlayerBoard(gs.ActivePlayerBoard.MapToVM(), gs.GameId.ToString(), gs.ActivePlayerName);
+                }
+                else
+                {
+                    lastActionEnd = $"";
+                }
+            }
             gs.Board.CoinBoard.ShuffleBoard();
             gs.LastAction = $"{playerName} shuffled the coin board {lastActionEnd}";
             await _hub.SendCoinBoard(gs.Board.CoinBoard.MapToVM(), gs.GameId.ToString());
+            await _hub.SendPlayerBoard(gs.NotActivePlayerBoard.MapToVM(), gs.NotActivePlayerName, gs.GameId.ToString());
+            await _hub.SendActionStatus(gs.GameId.ToString(), gs.LastAction, "du[pa");
             return gs;
         }
 

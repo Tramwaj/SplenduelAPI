@@ -12,7 +12,7 @@ namespace Splenduel.Core.Home.Model
         public string Player1 {get;}
         public string Player2 {get;}
         public DateTime StartingTime {get;}
-        public DateTime? EndingTime {get;}
+        public DateTime? EndTime {get;}
 
         public Duel(Guid id, string player1, string player2, DateTime startingTime)
         {
@@ -20,12 +20,12 @@ namespace Splenduel.Core.Home.Model
             Player1 = player1;
             Player2 = player2;
             StartingTime = startingTime;
-            EndingTime = null;
+            EndTime = null;
         }
 
         public Duel(Guid id, string player1, string player2, DateTime startingTime, DateTime? endingTime) : this(id, player1, player2, startingTime)
         {
-            EndingTime = endingTime;
+            EndTime = endingTime;
         }
     }
 }
