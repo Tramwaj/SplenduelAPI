@@ -20,7 +20,7 @@ namespace SplenDuelCoreTests.Game.Model
         [Test]
         public void Basic_Constructor_Initializes_Properties_Correctly_Second_Player()
         {
-            var playerBoard = new PlayerBoard();
+            var playerBoard = new PlayerBoard(true);
             Assert.Multiple(() =>
             {
                 Assert.That(playerBoard.ScrollsCount, Is.EqualTo(1));
@@ -32,7 +32,7 @@ namespace SplenDuelCoreTests.Game.Model
         [Test]
         public void Basic_Constructor_Initializes_Properties_Correctly_First_Player()
         {
-            var playerBoard = new PlayerBoard(true);
+            var playerBoard = new PlayerBoard(false);
             Assert.Multiple(() =>
             {
                 Assert.That(playerBoard.ScrollsCount, Is.EqualTo(0));
@@ -47,14 +47,16 @@ namespace SplenDuelCoreTests.Game.Model
             int scrollsCount = 2;
             var ownedCards = _cards.SkipXCardsAsList(3);
             var hiddenCards = _cards.GetXCardsAsList(2);
+            var guid = Guid.NewGuid();
+            var player = new Player("player", guid);
             var coins = new Dictionary<ColourEnum, int>()
             {
                 [ColourEnum.Black] = 2,
                 [ColourEnum.Red] = 1
             };
-            var playerBoard = new PlayerBoard(2, ownedCards.ToList(), hiddenCards.ToList(), coins.ToDictionary<ColourEnum, int>());
+            var playerBoard = new PlayerBoard(player, 2, ownedCards.ToList(), hiddenCards.ToList(), coins.ToDictionary<ColourEnum, int>());
             Assert.Multiple(() =>
-            {
+            {                
                 Assert.That(playerBoard.TotalPoints, Is.EqualTo(ownedCards.Sum(x => x.Points)));
                 Assert.That(playerBoard.Crowns, Is.EqualTo(ownedCards.Sum(x => x.Crowns)));
                 Assert.That(playerBoard.OwnedCards, Is.EqualTo(ownedCards));
@@ -71,13 +73,15 @@ namespace SplenDuelCoreTests.Game.Model
             int scrollsCount = 2;
             var ownedCards = _cards.SkipXCardsAsList(3);
             var hiddenCards = _cards.GetXCardsAsList(2);
+            var guid = Guid.NewGuid();
+            var player = new Player("player", guid);
             var coins = new Dictionary<ColourEnum, int>()
             {
                 [ColourEnum.Black] = 2,
                 [ColourEnum.Red] = 1
             };
-            var playerBoard = new PlayerBoard(2, ownedCards.ToList(), hiddenCards.ToList(), coins.ToDictionary<ColourEnum, int>());
-            var card = new Card(1,1, ColourEnum.Black, 1, 1, 1, new CardCost(White: 1, Blue: 0, Green: 1, Red: 1, Black: 0, Pink: 0));
+            var playerBoard = new PlayerBoard(player, 2, ownedCards.ToList(), hiddenCards.ToList(), coins.ToDictionary<ColourEnum, int>());
+            var card = new Card(1, 1, ColourEnum.Black, 1, 1, 1, new CardCost(White: 1, Blue: 0, Green: 1, Red: 1, Black: 0, Pink: 0));
             var response = await playerBoard.BuyCard(card);
             Assert.Multiple(() =>
             {
@@ -91,14 +95,16 @@ namespace SplenDuelCoreTests.Game.Model
             int scrollsCount = 2;
             var ownedCards = _cards.SkipXCardsAsList(3);
             var hiddenCards = _cards.GetXCardsAsList(2);
+            var guid = Guid.NewGuid();
+            var player = new Player("player", guid);
             var coins = new Dictionary<ColourEnum, int>()
             {
                 [ColourEnum.Black] = 2,
                 [ColourEnum.Red] = 1,
                 [ColourEnum.Gold] = 1
             };
-            var playerBoard = new PlayerBoard(2, ownedCards.ToList(), hiddenCards.ToList(), coins.ToDictionary<ColourEnum, int>());
-            var card = new Card(1, ColourEnum.Black, points: 1, miningPower: 1, crowns: 1, new CardCost(White: 1, Blue: 0, Green: 1, Red: 1, Black: 0, Pink: 0));
+            var playerBoard = new PlayerBoard(player, 2, ownedCards.ToList(), hiddenCards.ToList(), coins.ToDictionary<ColourEnum, int>());
+            var card = new Card(1, 1, ColourEnum.Black, points: 1, miningPower: 1, crowns: 1, new CardCost(White: 1, Blue: 0, Green: 1, Red: 1, Black: 0, Pink: 0));
             var response = await playerBoard.BuyCard(card);
             Assert.Multiple(() =>
             {

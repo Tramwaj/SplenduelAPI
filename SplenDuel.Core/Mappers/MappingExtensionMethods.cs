@@ -16,8 +16,6 @@ namespace Splenduel.Core.Mappers
                 GameId = gameState.GameId,
                 Player1Turn = gameState.Player1Turn,
                 Board = gameState.Board.MapToVM(),
-                Player1 = gameState.Player1.MapToVM(),
-                Player2 = gameState.Player2.MapToVM(),
                 LastAction = gameState.LastAction
             };
         }
@@ -67,6 +65,7 @@ namespace Splenduel.Core.Mappers
         {
             return new PlayerBoardVM
             {
+                Player = playerBoard.Player.MapToVM(),
                 HiddenCards = playerBoard.HiddenCards.Select(c => c.MapToVM()).ToList(),
                 ScrollsCount = playerBoard.ScrollsCount,
                 PointsByColour = playerBoard.PointsByColour.ToDictionary(k => k.Key.ToString(), v => v.Value),

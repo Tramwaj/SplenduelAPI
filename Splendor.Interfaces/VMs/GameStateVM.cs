@@ -7,8 +7,6 @@ namespace Splenduel.Interfaces.VMs
         public Guid GameId { get; set; }
         public bool Player1Turn { get; set; }
         public BoardVM Board { get; set; }
-        public PlayerVM Player1 { get; set; }
-        public PlayerVM Player2 { get; set; }
         public string LastAction { get; set; }
 
     }
@@ -63,6 +61,7 @@ namespace Splenduel.Interfaces.VMs
     }
     public class PlayerBoardVM
     {
+        public PlayerVM Player { get; set; }
         public List<CardVM> HiddenCards { get; set; }
         public int ScrollsCount { get; set; }
         public Dictionary<string, int> PointsByColour { get; set; }

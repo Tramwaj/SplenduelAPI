@@ -9,24 +9,27 @@ namespace Splenduel.Core.Game.Model
     {
         public ICollection<Card> HiddenCards { get; private set; } = new List<Card>();
         public int ScrollsCount { get; set; } = 0;
-        public IDictionary<ColourEnum,int> PointsByColour { get;private set; } = MapColourDictionaryFunctions.CreateColourEnumZeroDictionary();
+        public IDictionary<ColourEnum,int> PointsByColour { get;private set; } = new Dictionary<ColourEnum, int>();
 
         public int TotalPoints => PointsByColour.Values.Sum();
         public int Crowns { get; private set; } = 0;
         public ICollection<Card> OwnedCards { get; private set; } = new List<Card>();
-        public IDictionary<ColourEnum, int> MiningValues { get; private set; } = MapColourDictionaryFunctions.CreateColourEnumZeroDictionary();
-        public IDictionary<ColourEnum, int> Coins { get; private set; } = MapColourDictionaryFunctions.CreateColourEnumZeroDictionary();
+        public IDictionary<ColourEnum, int> MiningValues { get; private set; } = new Dictionary<ColourEnum, int>();// = MapColourDictionaryFunctions.CreateColourEnumZeroDictionary();
+        public IDictionary<ColourEnum, int> Coins { get; private set; } = new Dictionary<ColourEnum, int>(); //MapColourDictionaryFunctions.CreateColourEnumZeroDictionary();
 
         public int HiddenCardsCount => HiddenCards.Count();
-               
+
+        public Player Player { get; set; }
+
 
         public PlayerBoard(){}
-        public PlayerBoard(bool playerStarting=false)
+        public PlayerBoard(bool playerIsSecond)
         {
-            if (!playerStarting) ScrollsCount = 1;
+            if (playerIsSecond) ScrollsCount = 1;
         }
-        public PlayerBoard(int scrollsCount, ICollection<Card> ownedCards, ICollection<Card> hiddenCards, IDictionary<ColourEnum, int> coins)
+        public PlayerBoard(Player player, int scrollsCount, ICollection<Card> ownedCards, ICollection<Card> hiddenCards, IDictionary<ColourEnum, int> coins)
         {
+            this.Player = player;
             ScrollsCount = scrollsCount;
             this.OwnedCards = ownedCards;
             this.HiddenCards = hiddenCards;
