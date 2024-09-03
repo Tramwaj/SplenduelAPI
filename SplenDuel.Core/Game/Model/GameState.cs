@@ -17,42 +17,15 @@ namespace Splenduel.Core.Game.Model
         public Player Player1 { get; set; }
         public Player Player2 { get; set; }
         public string LastAction { get; set; }
-        public string ActivePlayerName
-        {
-            get
-            {
-                if (Player1Turn) return Player1.Name;
-                return Player2.Name;
-            }
-        }
-        public string NotActivePlayerName
-        {
-            get
-            {
-                if (Player1Turn) return Player2.Name;
-                return Player1.Name;
-            }
-        }
-        public PlayerBoard ActivePlayerBoard
-        {
-            get
-            {
-                if (Player1Turn) return Board.Player1Board;
-                return Board.Player2Board;
-            }
-        }
-        public PlayerBoard NotActivePlayerBoard
-        {
-            get
-            {
-                if (Player1Turn) return Board.Player2Board;
-                return Board.Player1Board;
-            }
-        }
+        public string ActivePlayerName => Player1Turn ? Player1.Name : Player2.Name;
+
+        public string NotActivePlayerName => Player1Turn ? Player2.Name : Player1.Name;
+        public PlayerBoard ActivePlayerBoard => Player1Turn ? Board.Player1Board : Board.Player2Board;
+        public PlayerBoard NotActivePlayerBoard => Player1Turn ? Board.Player2Board : Board.Player1Board;
 
         public GameState()
         {
-            
+
         }
         public GameState(Guid gameId, bool player1Turn, Board board, Player player1, Player player2, string lastAction)
         {
@@ -65,7 +38,7 @@ namespace Splenduel.Core.Game.Model
         }
         public async Task<GameState> PerPlayer(string playerName)
         {
-            if (Player1.Name==playerName) await this.Board.Player2Board.ClearHiddenCards();
+            if (Player1.Name == playerName) await this.Board.Player2Board.ClearHiddenCards();
             if (Player2.Name == playerName) await this.Board.Player1Board.ClearHiddenCards();
             else
             {
