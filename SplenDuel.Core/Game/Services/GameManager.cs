@@ -34,7 +34,7 @@ namespace Splenduel.Core.Game.Services
                 {
                     gameState = await _gameCreator.CreateNewGame(id);
                     var response = await _store.CreateGame(gameState);
-                    if (!response.Success) throw new ApplicationException(response.Error);
+                    if (!response.Success) throw new ApplicationException(response.Message);
                 }
                 catch
                 {

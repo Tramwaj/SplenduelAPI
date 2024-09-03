@@ -77,12 +77,12 @@ namespace SplenDuelCoreTests.Game.Model
                 [ColourEnum.Red] = 1
             };
             var playerBoard = new PlayerBoard(2, ownedCards.ToList(), hiddenCards.ToList(), coins.ToDictionary<ColourEnum, int>());
-            var card = new Card(1, ColourEnum.Black, 1, 1, 1, new CardCost(White: 1, Blue: 0, Green: 1, Red: 1, Black: 0, Pink: 0));
+            var card = new Card(1,1, ColourEnum.Black, 1, 1, 1, new CardCost(White: 1, Blue: 0, Green: 1, Red: 1, Black: 0, Pink: 0));
             var response = await playerBoard.BuyCard(card);
             Assert.Multiple(() =>
             {
                 Assert.That(response.Success, Is.EqualTo(false));
-                Assert.That(response.Error, Is.EqualTo("Payment was not possible!"));
+                Assert.That(response.Message, Is.EqualTo("Payment was not possible!"));
             });
         }
         [Test]
@@ -103,7 +103,7 @@ namespace SplenDuelCoreTests.Game.Model
             Assert.Multiple(() =>
             {
                 Assert.That(response.Success, Is.EqualTo(true));
-                Assert.That(response.Error, Is.EqualTo(""));
+                Assert.That(response.Message, Is.EqualTo(""));
                 Assert.That(playerBoard.OwnedCards.Count, Is.EqualTo(ownedCards.Count + 1));
                 Assert.That(playerBoard.TotalPoints, Is.EqualTo(ownedCards.Sum(x => x.Points) + 1));
             });

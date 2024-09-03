@@ -55,7 +55,7 @@ namespace SplenduelAPI.Controllers
             }
             var response = await _homeManager.CreateGameInvite(inviterUserName, invited, starts);
             if (!response.Success)
-                return BadRequest(response.Error);
+                return BadRequest(response.Message);
             else
                 return Ok();
         }
