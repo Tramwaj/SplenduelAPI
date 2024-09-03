@@ -11,13 +11,13 @@ namespace Splenduel.InMemoryStorage
 {
     public class GameInMemory : IGameStore
     {
-        private Dictionary<Guid, List<GameState>> _gameStates = new();
+        private Dictionary<Guid, GameState> _gameState = new();
         public async Task<DefaultResponse> CreateGame(GameState gameState)
         {
             var id = gameState.GameId;
             if (id == Guid.Empty || id == null) return DefaultResponse.Nok("Game_id is not proper");
-            if (_gameStates.ContainsKey(id)) return DefaultResponse.Nok("Game_id is already in database!");
-            _gameStates.Add(id, [gameState]);
+            if (_gameState.ContainsKey(id)) return DefaultResponse.Nok("Game_id is already in database!");
+            _gameState.Add(id, gameState);
             return DefaultResponse.ok;
         }
 
@@ -28,17 +28,17 @@ namespace Splenduel.InMemoryStorage
 
         public async Task<GameState> GetGameState(Guid id)
         {
-            if (!_gameStates.ContainsKey(id)) return null;
+            if (!_gameState.ContainsKey(id)) return null;
 
-            var gamestate = _gameStates[id].Last();
+            var gamestate = _gameState[id];
             return gamestate;
 
         }
 
         public async Task<DefaultResponse> UpdateGame(GameState gameState)
         {
-            if (!_gameStates.ContainsKey(gameState.GameId)) return DefaultResponse.Nok("GameID not found");
-            _gameStates[gameState.GameId].Add(gameState);
+            if (!_gameState.ContainsKey(gameState.GameId)) return DefaultResponse.Nok("GameID not found");
+            _gameState[gameState.GameId] = gameState;
             return DefaultResponse.ok;
         }
     }
