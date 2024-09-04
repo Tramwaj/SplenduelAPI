@@ -18,9 +18,9 @@ namespace SplenduelAPI.Hubs
             await _hubContext.Clients.Group(gameId).SendAsync("ReceiveCoinBoard", coinBoard);
         }
 
-        public async Task SendPlayerBoard(PlayerBoardVM playerBoard, string playerName, string gameId)
+        public async Task SendPlayerBoard(PlayerBoardVM playerBoard, string gameId)
         {
-            await _hubContext.Clients.Group(gameId).SendAsync("ReceivePlayerBoard", playerBoard, playerName);
+            await _hubContext.Clients.Group(gameId).SendAsync("ReceivePlayerBoard", playerBoard);
         }
 
         public async Task SendCardLevel(CardLevelVM cardLevel, int number, string gameId)
@@ -32,7 +32,7 @@ namespace SplenduelAPI.Hubs
         {
             await _hubContext.Clients.Group(gameId).SendAsync("ReceiveEndTurnMessage");
         }
-        public async Task SendActionStatus(string gameId, string message, string dupa)
+        public async Task SendActionStatus(string gameId, string message)
         {
             await _hubContext.Clients.Group(gameId).SendAsync("ReceiveActionStatus", message,"dupa");
         }

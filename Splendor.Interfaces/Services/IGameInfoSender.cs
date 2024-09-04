@@ -11,10 +11,10 @@ namespace Splenduel.Interfaces.Services
     public interface IGameInfoSender
     {
         public Task SendCoinBoard(CoinBoardVM coinBoard, string gameId);
-        public Task SendPlayerBoard(PlayerBoardVM playerBoard,string playerName, string gameId);
+        public Task SendPlayerBoard(PlayerBoardVM playerBoard, string gameId);
         //public Task SendNobleBoard(NobleBoardVM nobleBoard, string gameId);
         public Task SendCardLevel(CardLevelVM cardLevel,int number, string gameId);
         public Task SendEndTurnMessage(string gameId);
-        public Task SendActionStatus(string gameId, string message, string dupa);
+        public Task SendActionStatus(string gameId, string message);
     }
 }

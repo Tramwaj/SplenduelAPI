@@ -32,6 +32,35 @@ namespace Splenduel.Core.Game.Model
             Board = board;
             LastAction = lastAction;
         }
+        internal async Task<ActionResponse> PlayerShufflesTheBoard()
+        {
+            this.Board.CoinBoard.ShuffleBoard();
+            var gameObjects = new List<object>{this.Board.CoinBoard };
+            string message = $"{ActivePlayerName} shuffled the coinboard";
+            var TakeScrollResponse = this.Board.CoinBoard.TakeScroll();
+            if (TakeScrollResponse.Success)
+            {
+                NotActivePlayerBoard.ScrollsCount++;
+                gameObjects.Add(this.NotActivePlayerBoard);
+                message += $" and {NotActivePlayerName} took a scroll";
+            }
+            else if (ActivePlayerBoard.ScrollsCount >0)
+            {
+                ActivePlayerBoard.ScrollsCount--;
+                NotActivePlayerBoard.ScrollsCount++;
+                gameObjects.Add(this.ActivePlayerBoard);
+                gameObjects.Add(this.NotActivePlayerBoard);
+                message += $" and gave a scroll to {NotActivePlayerName}";
+            }
+            return new ActionResponse(true, message,gameObjects );
+        }
+
+
+        /// <summary>
+        /// This is probably no going to be used (cards shall be visible to all players)
+        /// </summary>
+        /// <param name="playerName"></param>
+        /// <returns></returns>
         public async Task<GameState> PerPlayer(string playerName)
         {
             if (Board.Player1Board.Player.Name == playerName) await this.Board.Player2Board.ClearHiddenCards();

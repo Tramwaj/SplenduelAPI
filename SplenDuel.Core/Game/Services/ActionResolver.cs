@@ -20,29 +20,65 @@ namespace Splenduel.Core.Game.Services
             _hub = hub;
         }
 
-        internal async Task<GameState> ResolveAction(ActionDTO action, GameState previousGameState, string playerName)
+        internal async Task<GameState?> ResolveAction(ActionDTO action, GameState previousGameState, string playerName)
         {
+            ActionResponse response;
+            if (playerName != previousGameState.ActivePlayerName)
+            {
+                response = new ActionResponse(false, "Not your turn");
+                await SendMessages(response, previousGameState.GameId);
+                return null;
+            }
+            GameState gs = previousGameState;
             switch (action.Type)
             {
                 case PlayerActionEnum.GetCoins:
-                    return await GetCoins(action, previousGameState, playerName);
+                    response = null;// decipher coinrequest, and call gs
+                    break;
                 case PlayerActionEnum.DropCoins:
-                    return await DropCoins(action, previousGameState, playerName);
+                    response = await DropCoins(action, previousGameState, playerName);
+                    break;
                 case PlayerActionEnum.ShuffleCoins:
-                    return await ShuffleCoins(action, previousGameState, playerName);
+                    response = await gs.PlayerShufflesTheBoard();
+                    break;
                 case PlayerActionEnum.BuyCard:
-                    return await BuyCard(action, previousGameState, playerName);
+                    response = await BuyCard(action, previousGameState, playerName);
+                    break;
                 case PlayerActionEnum.ReserveCard:
-                    return await ReserveCard(action, previousGameState, playerName);
+                    response = await ReserveCard(action, previousGameState, playerName);
+                    break;
                 case PlayerActionEnum.GetNoble:
-                    return await GetNoble(action, previousGameState, playerName);
+                    response = await GetNoble(action, previousGameState, playerName);
+                    break;
                 case PlayerActionEnum.TradeScroll:
-                    return await TradeScroll(action, previousGameState, playerName);
+                    response = await TradeScroll(action, previousGameState, playerName);
+                    break;
                 default: throw new ApplicationException("Invalid action type");
             }
+            await SendMessages(response, gs.GameId);
+            return gs;
         }
 
-        private async Task<GameState> GetCoins(ActionDTO action, GameState gs, string playerName)
+        private async Task SendMessages(ActionResponse response, Guid gameId)
+        {
+            if (!response.Success)
+            {
+                await _hub.SendActionStatus(gameId.ToString(), "Error in sending message: " + response.Message);
+                return;
+            }
+            foreach(var obj in response.ChangedObjects)
+            {
+                if (obj is CoinBoard cb) await _hub.SendCoinBoard(cb.MapToVM(), gameId.ToString());
+                if (obj is PlayerBoard pb) await _hub.SendPlayerBoard(pb.MapToVM(), gameId.ToString());
+
+                //if (obj is CardLevel cl) await _hub.SendCardLevel(cl.MapToVM(), cl.Level, gameId.ToString());
+                //if (obj is CardBoard
+                //int (obj is bool )
+            }
+            await _hub.SendActionStatus(gameId.ToString(), response.Message);
+        }
+
+        private async Task<ActionResponse> GetCoins(ActionDTO action, GameState gs, string playerName)
         {
             var takeCoinRequest = new List<CoinRequest>();// ((CoinRequest[])action.Payload[0]);
             var coinBoardResponse = gs.Board.CoinBoard.TakeCoins(takeCoinRequest);
@@ -53,10 +89,10 @@ namespace Splenduel.Core.Game.Services
                 gs.LastAction = $"{playerName} took coins";
             }
             else gs.LastAction = $"{playerName} did not take coins";
-            return gs;
+            throw new NotImplementedException();
         }
 
-        private async Task<GameState> DropCoins(ActionDTO action, GameState gs, string playerName)
+        private async Task<ActionResponse> DropCoins(ActionDTO action, GameState gs, string playerName)
         {
             //if (action.Payload[0] is List<ColourEnum> coins)
             //{
@@ -72,53 +108,22 @@ namespace Splenduel.Core.Game.Services
             throw new ArgumentException("Parameters should be a list of ColourEnum");
         }
 
-        private async Task<GameState> ShuffleCoins(ActionDTO action, GameState gs, string playerName)
-        {
-            var coinBoardResponse = gs.Board.CoinBoard.TakeScroll();
-            string lastActionEnd;
-            if (coinBoardResponse.Success)
-            {
-                gs.NotActivePlayerBoard.ScrollsCount++;
-                lastActionEnd = $"and opponent took a scroll from board";
-            }
-            else
-            {
-                if (gs.ActivePlayerBoard.ScrollsCount > 0)
-                {
-                    gs.ActivePlayerBoard.ScrollsCount--;
-                    gs.NotActivePlayerBoard.ScrollsCount++;
-                    lastActionEnd = $"and gave opponent a scroll";
-                    await _hub.SendPlayerBoard(gs.ActivePlayerBoard.MapToVM(), gs.GameId.ToString(), gs.ActivePlayerName);
-                }
-                else
-                {
-                    lastActionEnd = $"";
-                }
-            }
-            gs.Board.CoinBoard.ShuffleBoard();
-            gs.LastAction = $"{playerName} shuffled the coin board {lastActionEnd}";
-            await _hub.SendCoinBoard(gs.Board.CoinBoard.MapToVM(), gs.GameId.ToString());
-            await _hub.SendPlayerBoard(gs.NotActivePlayerBoard.MapToVM(), gs.NotActivePlayerName, gs.GameId.ToString());
-            await _hub.SendActionStatus(gs.GameId.ToString(), gs.LastAction, "du[pa");
-            return gs;
-        }
-
-        private async Task<GameState> BuyCard(ActionDTO action, GameState previousGameState, string playerName)
+        private async Task<ActionResponse> BuyCard(ActionDTO action, GameState previousGameState, string playerName)
         {
             throw new NotImplementedException();
         }
 
-        private async Task<GameState> ReserveCard(ActionDTO action, GameState previousGameState, string playerName)
+        private async Task<ActionResponse> ReserveCard(ActionDTO action, GameState previousGameState, string playerName)
         {
             throw new NotImplementedException();
         }
 
-        private async Task<GameState> GetNoble(ActionDTO action, GameState previousGameState, string playerName)
+        private async Task<ActionResponse> GetNoble(ActionDTO action, GameState previousGameState, string playerName)
         {
             throw new NotImplementedException();
         }
 
-        private async Task<GameState> TradeScroll(ActionDTO action, GameState previousGameState, string playerName)
+        private async  Task<ActionResponse> TradeScroll(ActionDTO action, GameState previousGameState, string playerName)
         {
             throw new NotImplementedException();
         }
