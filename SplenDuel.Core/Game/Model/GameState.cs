@@ -54,6 +54,17 @@ namespace Splenduel.Core.Game.Model
             }
             return new ActionResponse(true, message,gameObjects );
         }
+        internal async Task<ActionResponse> PlayerTakesCoins(CoinRequest[] request)
+        {
+            var response = this.Board.CoinBoard.TakeCoins(request);
+            if (response.Success)
+            {
+                await ActivePlayerBoard.AddCoins(request.Select(x => x.colour).ToList());
+                var coinsInfo = string.Join(", ", request.Select(x => x.colour.ToString()));
+                return new ActionResponse(true, $"{ActivePlayerName} took coins: {coinsInfo}", new List<object> { ActivePlayerBoard, Board.CoinBoard });
+            }
+            return new ActionResponse(false, response.Message);
+        }
 
 
         /// <summary>
