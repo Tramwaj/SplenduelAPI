@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Splenduel.Core.Game.Model
 {
-    public static class PlayerActionEnum
+    public static class PlayerActionNames
     {
         public const string GetCoins = "getCoins";
         public const string DropCoins = "dropCoins";

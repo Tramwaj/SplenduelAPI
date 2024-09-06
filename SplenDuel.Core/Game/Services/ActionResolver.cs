@@ -46,27 +46,27 @@ namespace Splenduel.Core.Game.Services
             };
             switch (action.Type)
             {
-                case PlayerActionEnum.GetCoins:
+                case PlayerActionNames.GetCoins:
                     var coinRequestDTOs = JsonSerializer.Deserialize<CoinRequestDTO[]>(action.Payload.ToString(),jsonOptions);
                     var coinRequests = coinRequestDTOs.Select(x=>x.CoinRequest()).ToArray();
-                    response = await gs.PlayerTakesCoins(coinRequests);// decipher coinrequest, and call gs
+                    response = await gs.PlayerTakesCoins(coinRequests);
                     break;
-                case PlayerActionEnum.DropCoins:
+                case PlayerActionNames.DropCoins:
                     response = await DropCoins(action, previousGameState, playerName);
                     break;
-                case PlayerActionEnum.ShuffleCoins:
+                case PlayerActionNames.ShuffleCoins:
                     response = await gs.PlayerShufflesTheBoard();
                     break;
-                case PlayerActionEnum.BuyCard:
+                case PlayerActionNames.BuyCard:
                     response = await BuyCard(action, previousGameState, playerName);
                     break;
-                case PlayerActionEnum.ReserveCard:
+                case PlayerActionNames.ReserveCard:
                     response = await ReserveCard(action, previousGameState, playerName);
                     break;
-                case PlayerActionEnum.GetNoble:
+                case PlayerActionNames.GetNoble:
                     response = await GetNoble(action, previousGameState, playerName);
                     break;
-                case PlayerActionEnum.TradeScroll:
+                case PlayerActionNames.TradeScroll:
                     response = await TradeScroll(action, previousGameState, playerName);
                     break;
                 default: throw new ApplicationException("Invalid action type");
