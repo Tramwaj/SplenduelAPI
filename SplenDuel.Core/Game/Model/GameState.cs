@@ -13,6 +13,7 @@ namespace Splenduel.Core.Game.Model
     {
         public Guid GameId { get; set; }
         public bool Player1Turn { get; set; }
+        public string State { get; set; }
         public Board Board { get; set; }
         public string LastAction { get; set; }
         public string ActivePlayerName => Player1Turn ? Board.Player1Board.Player.Name : Board.Player2Board.Player.Name;
@@ -52,7 +53,8 @@ namespace Splenduel.Core.Game.Model
                 gameObjects.Add(this.NotActivePlayerBoard);
                 message += $" and gave a scroll to {NotActivePlayerName}";
             }
-            return new ActionResponse(true, message,gameObjects );
+            this.State = ActionState.Normal;
+            return new ActionResponse(true, message,gameObjects, ActionState.Normal);
         }
         internal async Task<ActionResponse> PlayerTakesCoins(CoinRequest[] request)
         {
@@ -61,9 +63,15 @@ namespace Splenduel.Core.Game.Model
             {
                 await ActivePlayerBoard.AddCoins(request.Select(x => x.colour).ToList());
                 var coinsInfo = string.Join(", ", request.Select(x => x.colour.ToString()));
-                return new ActionResponse(true, $"{ActivePlayerName} took coins: {coinsInfo}", new List<object> { ActivePlayerBoard, Board.CoinBoard });
+                this.State = ActionState.Normal;
+                await EndTurn();
+                return new ActionResponse(true, $"{ActivePlayerName} took coins: {coinsInfo}", new List<object> { ActivePlayerBoard, Board.CoinBoard }, ActionState.EndTurn);
             }
             return new ActionResponse(false, response.Message);
+        }
+        private async Task EndTurn()
+        {
+            this.Player1Turn=!this.Player1Turn;
         }
 
 

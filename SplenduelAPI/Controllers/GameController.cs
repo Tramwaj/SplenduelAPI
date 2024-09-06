@@ -6,6 +6,7 @@ using Splenduel.Core.Game.Services;
 using Splenduel.Interfaces.DTOs;
 using Splenduel.Interfaces.VMs;
 using SplenduelAPI.Hubs;
+using System.Net;
 using System.Security.Claims;
 
 namespace SplenduelAPI.Controllers
@@ -51,7 +52,7 @@ namespace SplenduelAPI.Controllers
                 var gameData = await _gameManager.ResolveAction(actionn, playerName);
                 return Ok();
             }
-            catch (Exception ex) { return BadRequest(ex); }
+            catch (Exception ex) { return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message); }
         }
 
     }

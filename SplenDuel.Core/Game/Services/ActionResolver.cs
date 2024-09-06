@@ -91,7 +91,8 @@ namespace Splenduel.Core.Game.Services
                 //if (obj is CardBoard
                 //int (obj is bool )
             }
-            await _hub.SendActionStatus(gameId.ToString(), response.Message);
+            await _hub.SendActionStatus(gameId.ToString(), response.State);
+            //todo: currently when player leaves when asked for perform an action, it will not be reflected when he comes back
         }
 
         private async Task<ActionResponse> GetCoins(ActionDTO action, GameState gs, string playerName)
