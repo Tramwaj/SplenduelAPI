@@ -18,7 +18,7 @@ namespace SplenDuelCoreTests
         public void Card_Is_Read_Properly_1()
         {
             var cardCsv = cards.CardCsv[0];
-            Card cardFromCsv = CardFromCsvReader.Read(cardCsv, 1);
+            Card cardFromCsv = CardFromCsvReader.Read(cardCsv, 1, 1);
             Assert.Multiple(() =>
             {
                 Assert.That(cardFromCsv, Is.Not.Null);
@@ -39,7 +39,7 @@ namespace SplenDuelCoreTests
         public void Card_Is_Read_Properly_2()
         {
             var cardCsv = cards.CardCsv[1];
-            Card cardFromCsv = CardFromCsvReader.Read(cardCsv, 1);
+            Card cardFromCsv = CardFromCsvReader.Read(cardCsv, 1, 2);
             Assert.Multiple(() =>
             {
                 Assert.That(cardFromCsv, Is.Not.Null);
@@ -60,7 +60,7 @@ namespace SplenDuelCoreTests
         public void Card_Is_Read_Properly_3()
         {
             var cardCsv = cards.CardCsv[2];
-            Card cardFromCsv = CardFromCsvReader.Read(cardCsv, 1);
+            Card cardFromCsv = CardFromCsvReader.Read(cardCsv, 1, 3);
             Assert.Multiple(() =>
             {
                 Assert.That(cardFromCsv, Is.Not.Null);
@@ -81,7 +81,7 @@ namespace SplenDuelCoreTests
         public void Card_Is_Read_Properly_4()
         {
             var cardCsv = cards.CardCsv[3];
-            Card cardFromCsv = CardFromCsvReader.Read(cardCsv, 1);
+            Card cardFromCsv = CardFromCsvReader.Read(cardCsv, 1, 1);
             Assert.Multiple(() =>
             {
                 Assert.That(cardFromCsv, Is.Not.Null);
@@ -102,7 +102,7 @@ namespace SplenDuelCoreTests
         public void Card_Is_Read_Properly_5()
         {
             var cardCsv = cards.CardCsv[4];
-            Card cardFromCsv = CardFromCsvReader.Read(cardCsv, 1);
+            Card cardFromCsv = CardFromCsvReader.Read(cardCsv, 1, 1);
             Assert.Multiple(() =>
             {
                 Assert.That(cardFromCsv, Is.Not.Null);

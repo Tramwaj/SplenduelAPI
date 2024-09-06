@@ -10,7 +10,7 @@ namespace SplenDuelCoreTests.TestData
 {
     internal class TestCardsGenerator
     {
-        private string[] _cardCsv = ["White;1;;;;2;2;;;0;Pickup", "Blue;1;;;2;2;;1;;0;Turn", "Multi;1;4;;;;;1;;1;", "White;1;;4;;3;;;1;;Steal", "Red;1;;;2;4;;1;2;;Scroll"];
+        private string[] _cardCsv = ["White;1;;;;2;2;;;0;CoinPickup", "Blue;1;;;2;2;;1;;0;ExtraTurn", "Multi;1;4;;;;;1;;1;", "White;1;;4;;3;;;1;;Steal", "Red;1;;;2;4;;1;2;;Scroll"];
         //private Card[] _cards = 
         public string[] CardCsv { get => _cardCsv; set => _cardCsv = value; }
         public List<Card> Cards { get; private set; }
