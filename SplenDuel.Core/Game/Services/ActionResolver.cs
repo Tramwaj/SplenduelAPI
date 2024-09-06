@@ -1,4 +1,5 @@
-﻿using Splenduel.Core.Game.Model;
+﻿using Microsoft.IdentityModel.Tokens;
+using Splenduel.Core.Game.Model;
 using Splenduel.Core.Mappers;
 using Splenduel.Interfaces.DTOs;
 using Splenduel.Interfaces.Services;
@@ -7,6 +8,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Splenduel.Core.Game.Services
@@ -19,6 +21,13 @@ namespace Splenduel.Core.Game.Services
         {
             _hub = hub;
         }
+        private class CoinRequestDTO
+        {
+            public int i;
+            public int j;
+            public string colour;
+            public CoinRequest CoinRequest() => new CoinRequest(i, j, Enum.Parse<ColourEnum>(colour,true));
+        }
 
         internal async Task<GameState?> ResolveAction(ActionDTO action, GameState previousGameState, string playerName)
         {
@@ -30,10 +39,17 @@ namespace Splenduel.Core.Game.Services
                 return null;
             }
             GameState gs = previousGameState;
+            var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                IncludeFields = true
+            };
             switch (action.Type)
             {
                 case PlayerActionEnum.GetCoins:
-                    response = null;// decipher coinrequest, and call gs
+                    var coinRequestDTOs = JsonSerializer.Deserialize<CoinRequestDTO[]>(action.Payload.ToString(),jsonOptions);
+                    var coinRequests = coinRequestDTOs.Select(x=>x.CoinRequest()).ToArray();
+                    response = await gs.PlayerTakesCoins(coinRequests);// decipher coinrequest, and call gs
                     break;
                 case PlayerActionEnum.DropCoins:
                     response = await DropCoins(action, previousGameState, playerName);
@@ -66,7 +82,7 @@ namespace Splenduel.Core.Game.Services
                 await _hub.SendActionStatus(gameId.ToString(), "Error in sending message: " + response.Message);
                 return;
             }
-            foreach(var obj in response.ChangedObjects)
+            foreach (var obj in response.ChangedObjects)
             {
                 if (obj is CoinBoard cb) await _hub.SendCoinBoard(cb.MapToVM(), gameId.ToString());
                 if (obj is PlayerBoard pb) await _hub.SendPlayerBoard(pb.MapToVM(), gameId.ToString());
@@ -123,7 +139,7 @@ namespace Splenduel.Core.Game.Services
             throw new NotImplementedException();
         }
 
-        private async  Task<ActionResponse> TradeScroll(ActionDTO action, GameState previousGameState, string playerName)
+        private async Task<ActionResponse> TradeScroll(ActionDTO action, GameState previousGameState, string playerName)
         {
             throw new NotImplementedException();
         }
