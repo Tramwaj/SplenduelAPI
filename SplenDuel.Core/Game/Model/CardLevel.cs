@@ -8,7 +8,7 @@ namespace Splenduel.Core.Game.Model
         private Card[] _exposed;
         private ICollection<Card> _deck;
 
-        public Card[] Exposed => _exposed;
+        public Card?[] Exposed => _exposed;
         public int DeckCount => _deck.Count;
         public CardLevel(ICollection<Card> cards, int exposedCount)
         {
@@ -28,13 +28,20 @@ namespace Splenduel.Core.Game.Model
         }
         public CardLevel(){}
 
-        public Card? TakeCard(int position, out Card? cardDrawn)
+        public Card? TakeCard(int position, out Card? cardDrawn) //obsolete?
         {
             var cardTaken = _exposed[position];
             cardDrawn = DrawCardFromDeck();
             _exposed[position] = cardDrawn;
             return cardTaken;
         }
+        public void TakeCardById(int cardId)
+        {
+            int position = Array.FindIndex(_exposed, x => x.Id == cardId);
+            var cardDrawn = DrawCardFromDeck();
+            _exposed[position] = cardDrawn;
+        }
+        //todo: tests
         public Card? DrawCardFromDeck()
         {
             if (_deck.Count == 0) return null;

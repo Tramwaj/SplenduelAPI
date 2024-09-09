@@ -1,5 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Splenduel.Core.Game.Model.ViewModels;
+using Splenduel.Interfaces.DTOs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,11 +64,32 @@ namespace Splenduel.Core.Game.Model
             {
                 await ActivePlayerBoard.AddCoins(request.Select(x => x.colour).ToList());
                 var coinsInfo = string.Join(", ", request.Select(x => x.colour.ToString()));
-                this.State = ActionState.Normal;
-                await EndTurn();
-                return new ActionResponse(true, $"{ActivePlayerName} took coins: {coinsInfo}", new List<object> { ActivePlayerBoard, Board.CoinBoard }, ActionState.EndTurn);
+                var state = this.State = ActionState.EndTurn;
+                //todo: check for coins over 10
+                var msg = $"{ActivePlayerName} took coins: {coinsInfo}";
+                var objects = new List<object> { ActivePlayerBoard, Board.CoinBoard };
+                await this.EndTurn();
+                return new ActionResponse(true, msg, objects, state);
             }
             return new ActionResponse(false, response.Message);
+        }
+
+        internal async Task<ActionResponse> TryBuyCard(int cardId, ColourEnum colour)
+        {
+            CardLevel cardLevel = this.Board.GetCardLevel(cardId);
+            Card card = cardLevel.Exposed.First(x => x.Id == cardId);
+            if (cardLevel==null) return ActionResponse.Nok("Card not found on the board");
+            var buyCardResponse = await ActivePlayerBoard.BuyCard(card, colour);
+            if (!buyCardResponse.Success)
+            {
+                return new ActionResponse(false, buyCardResponse.Message);
+            }
+            cardLevel.TakeCardById(card.Id);
+            this.Board.CoinBoard.PutCoinsInTheBag(buyCardResponse.Object as IDictionary<ColourEnum, int>);
+            var gameObjects = new List<object> { ActivePlayerBoard, cardLevel };
+            this.State = ActionState.EndTurn;
+            this.EndTurn();
+            return new ActionResponse(true, $"{ActivePlayerName} bought card {card.ToString()}", gameObjects, ActionState.EndTurn);
         }
         private async Task EndTurn()
         {

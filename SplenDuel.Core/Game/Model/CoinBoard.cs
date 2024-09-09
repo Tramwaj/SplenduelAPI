@@ -149,23 +149,34 @@ namespace Splenduel.Core.Game.Model
             var coinsSorted = CoinsRequested.OrderBy(x => x.i).ThenBy(x => x.j).ToList();
             int di = coinsSorted[1].i - coinsSorted[0].i;
             int dj = coinsSorted[1].j - coinsSorted[0].j;
-            if (Math.Abs(di) > 2 || Math.Abs(dj) > 2) return false;
+            if (Math.Abs(di) > 1 || Math.Abs(dj) > 1) return false;
 
             if (di == 0 && dj == 0) return false;
 
-            if (Math.Abs(di) == 2 || Math.Abs(dj) == 2)
-            {
-                if (coinCount == 3) return false;
-                int emptyI = coinsSorted[0].i + di / 2;
-                int emptyj = coinsSorted[0].j + dj / 2;
-                if (CoinsOnBoard[emptyI][emptyj] != ColourEnum.Grey) return false;
-                else return true;
-            }
-
+            //if (Math.Abs(di) == 2 || Math.Abs(dj) == 2)
+            //{
+            //    if (coinCount == 3) return false;
+            //    int emptyI = coinsSorted[0].i + di / 2;
+            //    int emptyj = coinsSorted[0].j + dj / 2;
+            //    //if (CoinsOnBoard[emptyI][emptyj] != ColourEnum.Grey) return false;
+            //    else return true;
+            //}
+            if (coinCount == 2) return true;
 
             if (coinsSorted[2].i - coinsSorted[1].i != di) return false;
             if (coinsSorted[2].j - coinsSorted[1].j != dj) return false;
             return true;
+        }
+        public void PutCoinsInTheBag(IDictionary<ColourEnum,int> coins)
+        {
+            if (coins == null) return;
+            foreach (var coin in coins)
+            {
+                for (int i = 0; i < coin.Value; i++)
+                {
+                    _coinsInBag.Add(coin.Key);
+                }
+            }
         }
     }
 }

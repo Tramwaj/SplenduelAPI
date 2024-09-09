@@ -27,7 +27,12 @@ namespace Splenduel.Core.Game.Model
         }
         public bool IsEqualTo(Card card)
         {
-            return Colour==card.Colour && Level==card.Level && Points==card.Points && MiningPower==card.MiningPower && Crowns==card.Crowns && Cost==card.Cost && Action==card.Action;
+            return Level==card.Level && Points==card.Points && MiningPower==card.MiningPower && Crowns==card.Crowns && Cost==card.Cost && Action==card.Action;
+        }
+        public override string ToString()
+        {
+            return base.ToString();
+            //todo: complete card.tostring
         }
 
         public int Id { get; set; }

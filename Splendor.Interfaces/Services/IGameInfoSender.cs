@@ -13,7 +13,7 @@ namespace Splenduel.Interfaces.Services
         public Task SendCoinBoard(CoinBoardVM coinBoard, string gameId);
         public Task SendPlayerBoard(PlayerBoardVM playerBoard, string gameId);
         //public Task SendNobleBoard(NobleBoardVM nobleBoard, string gameId);
-        public Task SendCardLevel(CardLevelVM cardLevel,int number, string gameId);
+        public Task SendCardLevel(CardLevelVM cardLevel,int level, string gameId);
         public Task SendEndTurnMessage(string gameId);
         public Task SendActionStatus(string gameId, string message);
     }

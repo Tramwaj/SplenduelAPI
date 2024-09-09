@@ -35,7 +35,7 @@ namespace Splenduel.Core.Game.Services
             if (playerName != previousGameState.ActivePlayerName)
             {
                 response = new ActionResponse(false, "Not your turn");
-                await SendMessages(response, previousGameState.GameId);
+                //await SendMessages(response, previousGameState.GameId);
                 return null;
             }
             GameState gs = previousGameState;
@@ -47,8 +47,8 @@ namespace Splenduel.Core.Game.Services
             switch (action.Type)
             {
                 case PlayerActionNames.GetCoins:
-                    var coinRequestDTOs = JsonSerializer.Deserialize<CoinRequestDTO[]>(action.Payload.ToString(),jsonOptions);
-                    var coinRequests = coinRequestDTOs.Select(x=>x.CoinRequest()).ToArray();
+                    CoinRequestDTO[] coinRequestDTOs = JsonSerializer.Deserialize<CoinRequestDTO[]>(action.Payload.ToString(),jsonOptions);
+                    CoinRequest[] coinRequests = coinRequestDTOs.Select(x=>x.CoinRequest()).ToArray();
                     response = await gs.PlayerTakesCoins(coinRequests);
                     break;
                 case PlayerActionNames.DropCoins:
@@ -58,7 +58,10 @@ namespace Splenduel.Core.Game.Services
                     response = await gs.PlayerShufflesTheBoard();
                     break;
                 case PlayerActionNames.BuyCard:
-                    response = await BuyCard(action, previousGameState, playerName);
+                    BuyCardRequest cardRequest = JsonSerializer.Deserialize<BuyCardRequest>(action.Payload.ToString(),jsonOptions);
+                    ColourEnum colour = Enum.Parse<ColourEnum>(cardRequest.Colour);
+                    //Card card = action.Payload as Card;
+                    response = await gs.TryBuyCard(cardRequest.CardId, colour);
                     break;
                 case PlayerActionNames.ReserveCard:
                     response = await ReserveCard(action, previousGameState, playerName);
@@ -86,8 +89,11 @@ namespace Splenduel.Core.Game.Services
             {
                 if (obj is CoinBoard cb) await _hub.SendCoinBoard(cb.MapToVM(), gameId.ToString());
                 if (obj is PlayerBoard pb) await _hub.SendPlayerBoard(pb.MapToVM(), gameId.ToString());
-
-                //if (obj is CardLevel cl) await _hub.SendCardLevel(cl.MapToVM(), cl.Level, gameId.ToString());
+                if (obj is CardLevel cl)
+                {
+                    int level = cl.Exposed.First().Id / 100;
+                    await _hub.SendCardLevel(cl.MapToVM(), level, gameId.ToString());
+                }
                 //if (obj is CardBoard
                 //int (obj is bool )
             }

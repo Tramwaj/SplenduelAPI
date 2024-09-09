@@ -1,6 +1,7 @@
 ﻿using Splenduel.Core.Game.Model.Extensions;
 using Splenduel.Core.Global;
 using Splenduel.Core.Utils;
+using Splenduel.Interfaces.VMs;
 using System.Linq;
 
 namespace Splenduel.Core.Game.Model
@@ -14,8 +15,8 @@ namespace Splenduel.Core.Game.Model
         public int TotalPoints => PointsByColour.Values.Sum();
         public int Crowns { get; private set; } = 0;
         public ICollection<Card> OwnedCards { get; private set; } = new List<Card>();
-        public IDictionary<ColourEnum, int> MiningValues { get; private set; } = new Dictionary<ColourEnum, int>();// = MapColourDictionaryFunctions.CreateColourEnumZeroDictionary();
-        public IDictionary<ColourEnum, int> Coins { get; private set; } = new Dictionary<ColourEnum, int>(); //MapColourDictionaryFunctions.CreateColourEnumZeroDictionary();
+        public IDictionary<ColourEnum, int> MiningValues { get; private set; } = MapColourDictionaryFunctions.CreateColourEnumZeroDictionary();
+        public IDictionary<ColourEnum, int> Coins { get; private set; } = MapColourDictionaryFunctions.CreateColourEnumZeroDictionary();
 
         public int HiddenCardsCount => HiddenCards.Count();
 
@@ -79,10 +80,11 @@ namespace Splenduel.Core.Game.Model
                 {
                     int remainderValue = coinValue - value;
                     value -= coinValue;
+                    remainder[key] = remainderValue;
                     if (value <= 0) continue;
                     if (remainderValue < 0)
                     {
-                        goldCoins -= remainderValue;
+                        goldCoins += remainderValue;
                         if (goldCoins < 0) return false;
                         remainder[ColourEnum.Gold] = goldCoins;
                     }
@@ -99,8 +101,19 @@ namespace Splenduel.Core.Game.Model
         public async Task<DefaultResponse> BuyCard(Card card, ColourEnum colour = ColourEnum.Pink)
         {
             if (card == null) return DefaultResponse.Nok("Card is null!");
+            var payment = new Dictionary<ColourEnum, int>();
             if (!this.CanAfford(card.Cost.CostDictionary, out var newCoins)) return DefaultResponse.Nok("Payment was not possible!");
-            else this.Coins = newCoins;
+            else
+            {
+                foreach (var singleCost in Coins)
+                {
+                    if (newCoins.TryGetValue(singleCost.Key, out int newValue))
+                    {
+                        if (newValue < Coins[singleCost.Key]) payment.Add(singleCost.Key, Coins[singleCost.Key] - newValue);
+                    }
+                }
+                this.Coins = newCoins;
+            }
             if (card.Colour == ColourEnum.Multi)
             {
                 card.Colour = colour;
@@ -109,7 +122,8 @@ namespace Splenduel.Core.Game.Model
             this.OwnedCards.Add(card);
             UpdateResourcesForCard(card);
             if (this.IsWinConditionFullfilled()) return DefaultResponse.Ok("Win");
-            return DefaultResponse.ok;
+            var response = new DefaultResponse(true, payment);
+            return response;
         }
         private void UpdateResourcesForCard(Card card)
         {
