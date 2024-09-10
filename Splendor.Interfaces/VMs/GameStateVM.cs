@@ -40,6 +40,7 @@ namespace Splenduel.Interfaces.VMs
         public int Points { get; set; }
         public string Colour { get; set; }
         public int Crowns { get; set; }
+        public string Action { get; set; }
         public SingleCost[] CardCost { get; set; }
     }
     public class SingleCost

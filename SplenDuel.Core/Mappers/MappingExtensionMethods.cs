@@ -50,6 +50,7 @@ namespace Splenduel.Core.Mappers
                 Points = card.Points,
                 Crowns = card.Crowns,
                 Colour = card.Colour.ToString(),
+                Action = card.Action.ToString(),
                 CardCost = cardcost
             };
         }
