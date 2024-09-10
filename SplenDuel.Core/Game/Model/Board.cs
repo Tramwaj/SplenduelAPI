@@ -23,7 +23,6 @@ namespace Splenduel.Core.Game.Model
 
         internal CardLevel GetCardLevel(int cardId)
         {
-            if (cardId == 0) return null;
             if (Level1.Exposed.Any(x=>x.Id==cardId)) return Level1;
             if (Level2.Exposed.Any(x => x.Id == cardId)) return Level2;
             if (Level3.Exposed.Any(x => x.Id == cardId)) return Level3;
