@@ -82,7 +82,7 @@ namespace Splenduel.Core.Game.Services
         {
             if (!response.Success)
             {
-                await _hub.SendActionStatus(gameId.ToString(), "Error in sending message: " + response.Message);
+                await _hub.SendActionStatus(gameId.ToString(),"", response.Message);
                 return;
             }
             foreach (var obj in response.ChangedObjects)
@@ -97,7 +97,7 @@ namespace Splenduel.Core.Game.Services
                 //if (obj is CardBoard
                 //int (obj is bool )
             }
-            await _hub.SendActionStatus(gameId.ToString(), response.State);
+            await _hub.SendActionStatus(gameId.ToString(), response.State, response.Message);
             //todo: currently when player leaves when asked for perform an action, it will not be reflected when he comes back
         }
 

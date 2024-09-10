@@ -32,9 +32,9 @@ namespace SplenduelAPI.Hubs
         {
             await _hubContext.Clients.Group(gameId).SendAsync("ReceiveEndTurnMessage");
         }
-        public async Task SendActionStatus(string gameId, string message)
+        public async Task SendActionStatus(string gameId, string status, string message)
         {
-            await _hubContext.Clients.Group(gameId).SendAsync("ReceiveActionStatus", message);
+            await _hubContext.Clients.Group(gameId).SendAsync("ReceiveActionStatus", status, message);
         }
     }
 }
