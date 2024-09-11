@@ -35,7 +35,7 @@ namespace Splenduel.Core.Game.Services
             if (playerName != previousGameState.ActivePlayerName)
             {
                 response = new ActionResponse(false, "Not your turn");
-                //await SendMessages(response, previousGameState.GameId);
+                await SendMessages(response, previousGameState.GameId);
                 return null;
             }
             GameState gs = previousGameState;
