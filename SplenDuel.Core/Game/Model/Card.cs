@@ -31,7 +31,7 @@ namespace Splenduel.Core.Game.Model
         }
         public override string ToString()
         {
-            return base.ToString();
+            return $"Card: {Colour}:{MiningPower}, {Points}p, {Crowns}c  {(Action!=CardActionEnum.None?Action:"")}";
             //todo: complete card.tostring
         }
 
