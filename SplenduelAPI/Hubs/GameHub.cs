@@ -38,7 +38,7 @@ namespace SplenduelAPI.Hubs
         }
         public async Task SendActionStatus(string gameId, string message)
         {
-            await Clients.Group(gameId).SendAsync("ReceiveActionStatus", message);
+            await Clients.Group(gameId).SendAsync("ReceiveActionStatjhghgjus", message);
         }
 
     }
