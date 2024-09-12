@@ -36,5 +36,9 @@ namespace SplenduelAPI.Hubs
         {
             await _hubContext.Clients.Group(gameId).SendAsync("ReceiveActionStatus", status, message);
         }
+        public async Task SendPersonalActionStatus(string name, string status, string message)
+        {
+            await _hubContext.Clients.User(name).SendAsync("ReceivePersonalActionStatus", status, message);
+        }
     }
 }

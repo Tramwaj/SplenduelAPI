@@ -16,5 +16,6 @@ namespace Splenduel.Interfaces.Services
         public Task SendCardLevel(CardLevelVM cardLevel,int level, string gameId);
         public Task SendEndTurnMessage(string gameId);
         public Task SendActionStatus(string gameId,string status, string message);
+        public Task SendPersonalActionStatus(string name, string status, string message);
     }
 }

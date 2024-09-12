@@ -35,7 +35,7 @@ namespace Splenduel.Core.Game.Services
             if (playerName != previousGameState.ActivePlayerName)
             {
                 response = new ActionResponse(false, "Not your turn");
-                await SendMessages(response, previousGameState.GameId);
+                await _hub.SendPersonalActionStatus(previousGameState.ActivePlayerName, response.State, response.Message);
                 return null;
             }
             GameState gs = previousGameState;
@@ -74,17 +74,19 @@ namespace Splenduel.Core.Game.Services
                     break;
                 default: throw new ApplicationException("Invalid action type");
             }
+            if (!response.Success)
+            {
+                await _hub.SendPersonalActionStatus(gs.ActivePlayerName,response.State, response.Message);
+                return null;
+            }
             await SendMessages(response, gs.GameId);
+            
             return gs;
         }
 
         private async Task SendMessages(ActionResponse response, Guid gameId)
         {
-            if (!response.Success)
-            {
-                await _hub.SendActionStatus(gameId.ToString(),"", response.Message);
-                return;
-            }
+            
             foreach (var obj in response.ChangedObjects)
             {
                 if (obj is CoinBoard cb) await _hub.SendCoinBoard(cb.MapToVM(), gameId.ToString());
