@@ -20,12 +20,16 @@ namespace Splenduel.Core.Game.Model
             Cost = cost;
             Action = cardAction;
         }
+        public Card Copy()
+        {
+            return new Card(this.Id, this.Level, this.Colour, this.Points, this.MiningPower, this.Crowns, this.Cost, this.Action);
+        }
         static Card Blank()
         {
             return new Card(0,0, ColourEnum.Grey, 0, 0, 0, null);
 
         }
-        public bool IsEqualTo(Card card)
+        public bool IsValueEqualTo(Card card)
         {
             return Level==card.Level && Points==card.Points && MiningPower==card.MiningPower && Crowns==card.Crowns && Cost==card.Cost && Action==card.Action;
         }

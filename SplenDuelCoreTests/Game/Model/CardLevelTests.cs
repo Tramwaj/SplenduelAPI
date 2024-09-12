@@ -48,9 +48,9 @@ namespace SplenDuelCoreTests.Game.Model
             Assert.Multiple(() =>
             {
                 Assert.That(lvl.DeckCount, Is.EqualTo(0));
-                Assert.That(card0a.IsEqualTo((Card)testCards[0]));
-                Assert.That(card1a, Is.EqualTo((Card)testCards[1]));
-                Assert.That(card2a, Is.EqualTo((Card)testCards[2]));
+                Assert.That(card0a.IsValueEqualTo((Card)testCards[0]));
+                Assert.That(card1a.IsValueEqualTo((Card)testCards[1]));
+                Assert.That(card2a.IsValueEqualTo((Card)testCards[2]));
             });
         }
         [Test]
@@ -64,8 +64,8 @@ namespace SplenDuelCoreTests.Game.Model
             var card0c = lvl.TakeCard(0, out Card CardDrawn2);
             Assert.Multiple(() =>
             {
-                Assert.That(CardDrawn0.IsEqualTo((Card)testCards.First()) || CardDrawn0.IsEqualTo((Card)testCards.Last()));
-                Assert.That(CardDrawn1.IsEqualTo((Card)testCards.First()) || CardDrawn1.IsEqualTo((Card)testCards.Last()));
+                Assert.That(CardDrawn0.IsValueEqualTo((Card)testCards.First()) || CardDrawn0.IsValueEqualTo((Card)testCards.Last()));
+                Assert.That(CardDrawn1.IsValueEqualTo((Card)testCards.First()) || CardDrawn1.IsValueEqualTo((Card)testCards.Last()));
                 Assert.That(CardDrawn0, Is.Not.EqualTo(CardDrawn1));
                 Assert.That(CardDrawn2, Is.Null);
                 Assert.That(card0b,Is.EqualTo(CardDrawn0));

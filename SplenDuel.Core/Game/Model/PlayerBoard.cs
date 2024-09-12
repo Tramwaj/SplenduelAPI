@@ -10,7 +10,7 @@ namespace Splenduel.Core.Game.Model
     {
         public ICollection<Card> HiddenCards { get; private set; } = new List<Card>();
         public int ScrollsCount { get; set; } = 0;
-        public IDictionary<ColourEnum,int> PointsByColour { get;private set; } = new Dictionary<ColourEnum, int>();
+        public IDictionary<ColourEnum, int> PointsByColour { get; private set; } = new Dictionary<ColourEnum, int>();
 
         public int TotalPoints => PointsByColour.Values.Sum();
         public int Crowns { get; private set; } = 0;
@@ -23,7 +23,7 @@ namespace Splenduel.Core.Game.Model
         public Player Player { get; set; }
 
 
-        public PlayerBoard(){}
+        public PlayerBoard() { }
         public PlayerBoard(bool playerIsSecond)
         {
             if (playerIsSecond) ScrollsCount = 1;
@@ -54,7 +54,7 @@ namespace Splenduel.Core.Game.Model
         }
         public async Task<DefaultResponse> DropCoins(ICollection<ColourEnum> coins)
         {
-            foreach(var coin in coins)
+            foreach (var coin in coins)
             {
                 if (this.Coins.TryGetValue(coin, out int coinValue))
                 {
@@ -80,7 +80,7 @@ namespace Splenduel.Core.Game.Model
                 {
                     int remainderValue = coinValue - value;
                     value -= coinValue;
-                    remainder[key] = remainderValue;
+                    remainder[key] = remainderValue > 0 ? remainderValue : 0;
                     if (value <= 0) continue;
                     if (remainderValue < 0)
                     {
@@ -101,8 +101,18 @@ namespace Splenduel.Core.Game.Model
         public async Task<DefaultResponse> BuyCard(Card card, ColourEnum colour = ColourEnum.Pink)
         {
             if (card == null) return DefaultResponse.Nok("Card is null!");
+            Card newCard = card.Copy();
+            if (card.Colour == ColourEnum.Multi)
+            {
+                newCard.Colour = colour;
+                if (!this.MiningValues.TryGetValue(colour, out int value) || value <1)
+                {
+                    return DefaultResponse.Nok("You don't have this colour!");
+                }
+                if (colour == ColourEnum.Pink || colour == ColourEnum.Multi) return DefaultResponse.Nok("No colour requested for multi-coloured card!");
+            }
             var payment = new Dictionary<ColourEnum, int>();
-            if (!this.CanAfford(card.Cost.CostDictionary, out var newCoins)) return DefaultResponse.Nok("Payment was not possible!");
+            if (!this.CanAfford(newCard.Cost.CostDictionary, out var newCoins)) return DefaultResponse.Nok("Payment was not possible!");
             else
             {
                 foreach (var singleCost in Coins)
@@ -114,13 +124,8 @@ namespace Splenduel.Core.Game.Model
                 }
                 this.Coins = newCoins;
             }
-            if (card.Colour == ColourEnum.Multi)
-            {
-                card.Colour = colour;
-                if (colour == ColourEnum.Pink) return DefaultResponse.Nok("No coour requested for multi-coloured card!");
-            }
-            this.OwnedCards.Add(card);
-            UpdateResourcesForCard(card);
+            this.OwnedCards.Add(newCard);
+            UpdateResourcesForCard(newCard);
             if (this.IsWinConditionFullfilled()) return DefaultResponse.Ok("Win");
             var response = new DefaultResponse(true, payment);
             return response;
@@ -151,7 +156,7 @@ namespace Splenduel.Core.Game.Model
         {
             if (this.HiddenCardsCount >= 3) return DefaultResponse.Nok("Player already has 3 hidden cards");
             this.HiddenCards.Add(card);
-            if (isGoldCoinAdded) this.Coins.CreateOrAddIfExists(ColourEnum.Gold,1);
+            if (isGoldCoinAdded) this.Coins.CreateOrAddIfExists(ColourEnum.Gold, 1);
             return DefaultResponse.ok;
         }
         public async Task ClearHiddenCards()
