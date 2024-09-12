@@ -87,9 +87,10 @@ namespace Splenduel.Core.Game.Model
             cardLevel.TakeCardById(card.Id);
             this.Board.CoinBoard.PutCoinsInTheBag(buyCardResponse.Object as IDictionary<ColourEnum, int>);
             var gameObjects = new List<object> { ActivePlayerBoard, cardLevel };
+            var message = $"{ActivePlayerName} bought card {card.ToString()}";
             this.State = ActionState.EndTurn;
             this.EndTurn();
-            return new ActionResponse(true, $"{ActivePlayerName} bought card {card.ToString()}", gameObjects, ActionState.EndTurn);
+            return new ActionResponse(true, message, gameObjects, ActionState.EndTurn);
         }
         private async Task EndTurn()
         {
