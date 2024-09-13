@@ -38,24 +38,38 @@ namespace Splenduel.Core.Game.Model
         {
             this.Board.CoinBoard.ShuffleBoard();
             var gameObjects = new List<object>{this.Board.CoinBoard };
-            string message = $"{ActivePlayerName} shuffled the coinboard";
+            string message = $"{ActivePlayerName} shuffled the coinboard.";
+            message += PlayerGetsScroll(false, gameObjects);
+            
+            this.State = ActionState.Normal;
+            return new ActionResponse(true, message,gameObjects, ActionState.Normal);
+        }
+        private string PlayerGetsScroll(bool active, List<object> gameObjects)
+        {
+            var takingPlayerBoard = active ? ActivePlayerBoard : NotActivePlayerBoard;
+            var otherPlayerBoard = active ? NotActivePlayerBoard : ActivePlayerBoard;
+                        
+            string message = "";
             var TakeScrollResponse = this.Board.CoinBoard.TakeScroll();
             if (TakeScrollResponse.Success)
             {
-                NotActivePlayerBoard.ScrollsCount++;
-                gameObjects.Add(this.NotActivePlayerBoard);
-                message += $" and {NotActivePlayerName} took a scroll";
+                takingPlayerBoard.ScrollsCount++;
+                gameObjects.Add(takingPlayerBoard);
+                message += $"{takingPlayerBoard.Player.Name} took a scroll.";
             }
-            else if (ActivePlayerBoard.ScrollsCount >0)
+            else if (otherPlayerBoard.ScrollsCount > 0)
             {
-                ActivePlayerBoard.ScrollsCount--;
-                NotActivePlayerBoard.ScrollsCount++;
-                gameObjects.Add(this.ActivePlayerBoard);
-                gameObjects.Add(this.NotActivePlayerBoard);
-                message += $" and gave a scroll to {NotActivePlayerName}";
+                otherPlayerBoard.ScrollsCount--;
+                takingPlayerBoard.ScrollsCount++;
+                gameObjects.Add(takingPlayerBoard);
+                gameObjects.Add(otherPlayerBoard);
+                message += $" {takingPlayerBoard.Player.Name} gave a scroll to {otherPlayerBoard.Player.Name}";
             }
-            this.State = ActionState.Normal;
-            return new ActionResponse(true, message,gameObjects, ActionState.Normal);
+            else
+            {
+                message += $"No scrolls to be given to {takingPlayerBoard.Player.Name}";
+            }
+            return message;
         }
         internal async Task<ActionResponse> PlayerTakesCoins(CoinRequest[] request)
         {
