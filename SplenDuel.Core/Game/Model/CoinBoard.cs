@@ -109,9 +109,8 @@ namespace Splenduel.Core.Game.Model
         }
         public DefaultResponse ExchangeScroll(CoinRequest coinRequest)
         {
-            if (this.ScrollCount + 1 > _initialScrollCount) return new DefaultResponse(false, "Too much scrolls!");
-            ScrollCount++;
             if (!AreCoinRequestColoursProper([coinRequest])) return new DefaultResponse(false, "Requested coin position is not proper!");
+            ScrollCount++;
             CoinsOnBoard[coinRequest.i][coinRequest.j] = ColourEnum.Grey;
             return new DefaultResponse(true);
         }

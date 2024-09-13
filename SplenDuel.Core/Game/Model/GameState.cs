@@ -92,6 +92,18 @@ namespace Splenduel.Core.Game.Model
             this.EndTurn();
             return new ActionResponse(true, message, gameObjects, ActionState.EndTurn);
         }
+        internal async Task<ActionResponse> PlayerExchangesScroll(CoinRequest coinRequest)
+        {
+            if (ActivePlayerBoard.ScrollsCount < 1) return ActionResponse.Nok("No scrolls to exchange"); 
+            //this has to be here because of not being able to drop the partially changed GameState right now (could be resolved with different approach to persistence)
+            var response = this.Board.CoinBoard.ExchangeScroll(coinRequest);
+            if (!response.Success) return ActionResponse.Nok(response.Message);
+            await ActivePlayerBoard.GetCoinForScroll(coinRequest.colour);
+            var gameObjects = new List<object> { ActivePlayerBoard, Board.CoinBoard };
+            var message = $"{ActivePlayerName} exchanged a scroll for a {coinRequest.colour} coin";
+            this.State = ActionState.Normal;
+            return new ActionResponse(true, message, gameObjects, ActionState.Normal);
+        }
         private async Task EndTurn()
         {
             this.Player1Turn=!this.Player1Turn;

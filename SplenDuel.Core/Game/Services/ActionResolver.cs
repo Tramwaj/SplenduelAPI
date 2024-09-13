@@ -35,7 +35,7 @@ namespace Splenduel.Core.Game.Services
             if (playerName != previousGameState.ActivePlayerName)
             {
                 response = new ActionResponse(false, "Not your turn");
-                await _hub.SendPersonalActionStatus(previousGameState.ActivePlayerName, response.State, response.Message);
+                await _hub.SendActionStatus(previousGameState.GameId.ToString(), response.State, response.Message);
                 return null;
             }
             GameState gs = previousGameState;
@@ -70,13 +70,15 @@ namespace Splenduel.Core.Game.Services
                     response = await GetNoble(action, previousGameState, playerName);
                     break;
                 case PlayerActionNames.TradeScroll:
-                    response = await TradeScroll(action, previousGameState, playerName);
+                    CoinRequestDTO coinRequestDTO = JsonSerializer.Deserialize<CoinRequestDTO>(action.Payload.ToString(), jsonOptions);
+                    CoinRequest coinRequest = coinRequestDTO.CoinRequest();
+                    response = await gs.PlayerExchangesScroll(coinRequest);
                     break;
                 default: throw new ApplicationException("Invalid action type");
             }
             if (!response.Success)
             {
-                await _hub.SendPersonalActionStatus(gs.ActivePlayerName,response.State, response.Message);
+                await _hub.SendActionStatus(gs.GameId.ToString(), response.State, response.Message);
                 return null;
             }
             await SendMessages(response, gs.GameId);
