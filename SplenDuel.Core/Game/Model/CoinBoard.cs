@@ -109,6 +109,7 @@ namespace Splenduel.Core.Game.Model
         }
         public DefaultResponse ExchangeScroll(CoinRequest coinRequest)
         {
+            if (coinRequest.colour == ColourEnum.Gold) return new DefaultResponse(false, "Gold coin cannot be exchanged for a scroll!");
             if (!AreCoinRequestColoursProper([coinRequest])) return new DefaultResponse(false, "Requested coin position is not proper!");
             ScrollCount++;
             CoinsOnBoard[coinRequest.i][coinRequest.j] = ColourEnum.Grey;
@@ -122,6 +123,7 @@ namespace Splenduel.Core.Game.Model
         /// <returns></returns>
         public DefaultResponse TakeCoins(ICollection<CoinRequest> CoinsRequested)
         {
+            if (CoinsRequested.Any(x=>x.colour== ColourEnum.Gold)) return new DefaultResponse(false, "Gold coin cannot be taken from the board!");
             if (!AreCoinRequestColoursProper(CoinsRequested)) return new DefaultResponse(false, "Requested coin colours don't match!");
             if (!AreCoinRequestPositionProper(CoinsRequested)) return new DefaultResponse(false, "Requested coin positions are not proper!");
             foreach (CoinRequest coin in CoinsRequested)
