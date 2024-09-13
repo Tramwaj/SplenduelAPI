@@ -82,6 +82,10 @@ namespace Splenduel.Core.Game.Model
                 //todo: check for coins over 10
                 var msg = $"{ActivePlayerName} took coins: {coinsInfo}";
                 var objects = new List<object> { ActivePlayerBoard, Board.CoinBoard };
+                if (request.Count(x=>x.colour==ColourEnum.Pink)==2 || request.Select(x=>x.colour).Distinct().Count()==1)
+                {
+                    msg += PlayerGetsScroll(false, objects);
+                }
                 await this.EndTurn();
                 return new ActionResponse(true, msg, objects, state);
             }
