@@ -8,6 +8,7 @@ namespace Splenduel.Interfaces.VMs
         public bool Player1Turn { get; set; }
         public BoardVM Board { get; set; }
         public string LastAction { get; set; }
+        public string ActionState { get; set; }
 
     }
     public class BoardVM
