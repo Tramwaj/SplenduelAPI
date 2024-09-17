@@ -52,7 +52,8 @@ namespace Splenduel.Core.Game.Services
                     response = await gs.PlayerTakesCoins(coinRequests);
                     break;
                 case PlayerActionNames.DropCoins:
-                    response = await DropCoins(action, previousGameState, playerName);
+                    ColourEnum[] coins = JsonSerializer.Deserialize<string[]>(action.Payload.ToString(), jsonOptions).Select(c=>Enum.Parse<ColourEnum>(c)).ToArray();
+                    response = await gs.PlayerDropsCoins(coins);
                     break;
                 case PlayerActionNames.ShuffleCoins:
                     response = await gs.PlayerShufflesTheBoard();

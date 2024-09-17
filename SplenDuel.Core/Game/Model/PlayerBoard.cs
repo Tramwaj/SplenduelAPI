@@ -17,6 +17,7 @@ namespace Splenduel.Core.Game.Model
         public ICollection<Card> OwnedCards { get; private set; } = new List<Card>();
         public IDictionary<ColourEnum, int> MiningValues { get; private set; } = MapColourDictionaryFunctions.CreateColourEnumZeroDictionary();
         public IDictionary<ColourEnum, int> Coins { get; private set; } = MapColourDictionaryFunctions.CreateColourEnumZeroDictionary();
+        public int CoinsCount => Coins.Values.Sum();
 
         public int HiddenCardsCount => HiddenCards.Count();
 
@@ -105,7 +106,7 @@ namespace Splenduel.Core.Game.Model
             if (card.Colour == ColourEnum.Multi)
             {
                 newCard.Colour = colour;
-                if (!this.MiningValues.TryGetValue(colour, out int value) || value <1)
+                if (!this.MiningValues.TryGetValue(colour, out int value) || value < 1)
                 {
                     return DefaultResponse.Nok("You don't have this colour!");
                 }

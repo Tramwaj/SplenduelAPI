@@ -179,5 +179,13 @@ namespace Splenduel.Core.Game.Model
                 }
             }
         }
+        public void PutCoinsInTheBag(ColourEnum[] coins)
+        {
+            if (coins == null) return;
+            foreach (var coin in coins)
+            {
+                _coinsInBag.Add(coin);
+            }
+        }
     }
 }

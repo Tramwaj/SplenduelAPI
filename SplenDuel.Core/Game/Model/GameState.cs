@@ -37,18 +37,18 @@ namespace Splenduel.Core.Game.Model
         internal async Task<ActionResponse> PlayerShufflesTheBoard()
         {
             this.Board.CoinBoard.ShuffleBoard();
-            var gameObjects = new List<object>{this.Board.CoinBoard };
+            var gameObjects = new List<object> { this.Board.CoinBoard };
             string message = $"{ActivePlayerName} shuffled the coinboard.";
             message += PlayerGetsScroll(false, gameObjects);
-            
+
             this.State = ActionState.Normal;
-            return new ActionResponse(true, message,gameObjects, ActionState.Normal);
+            return new ActionResponse(true, message, gameObjects, ActionState.Normal);
         }
         private string PlayerGetsScroll(bool active, List<object> gameObjects)
         {
             var takingPlayerBoard = active ? ActivePlayerBoard : NotActivePlayerBoard;
             var otherPlayerBoard = active ? NotActivePlayerBoard : ActivePlayerBoard;
-                        
+
             string message = "";
             var TakeScrollResponse = this.Board.CoinBoard.TakeScroll();
             if (TakeScrollResponse.Success)
@@ -78,25 +78,41 @@ namespace Splenduel.Core.Game.Model
             {
                 await ActivePlayerBoard.AddCoins(request.Select(x => x.colour).ToList());
                 var coinsInfo = string.Join(", ", request.Select(x => x.colour.ToString()));
-                var state = this.State = ActionState.EndTurn;
                 //todo: check for coins over 10
-                var msg = $"{ActivePlayerName} took coins: {coinsInfo}";
+                var msg = $"{ActivePlayerName} took coins: {coinsInfo}. ";
                 var objects = new List<object> { ActivePlayerBoard, Board.CoinBoard };
-                if (request.Count(x=>x.colour==ColourEnum.Pink)==2 || request.Select(x=>x.colour).Distinct().Count()==1)
+                if (request.Count(x => x.colour == ColourEnum.Pink) == 2 || request.Select(x => x.colour).Distinct().Count() == 1)
                 {
                     msg += PlayerGetsScroll(false, objects);
                 }
-                await this.EndTurn();
-                return new ActionResponse(true, msg, objects, state);
+                if (ActivePlayerBoard.CoinsCount <= 10)
+                {
+                    this.State = ActionState.EndTurn;
+                    await this.EndTurn();
+                    return new ActionResponse(true, msg, objects, this.State);
+                }
+                msg += $"{ActivePlayerName} has 10 or more coins and has to drop {ActivePlayerBoard.CoinsCount - 10} of them. ";
+                this.State = ActionState.DropCoins;
+                return new ActionResponse(true, msg, objects, this.State);
             }
             return new ActionResponse(false, response.Message);
         }
-
+        internal async Task<ActionResponse> PlayerDropsCoins(ColourEnum[] coins)
+        {
+            var response = await ActivePlayerBoard.DropCoins(coins);
+            if (!response.Success) return new ActionResponse(false, response.Message);
+            this.Board.CoinBoard.PutCoinsInTheBag(coins);
+            var gameObjects = new List<object> { ActivePlayerBoard, Board.CoinBoard };
+            var message = $"{ActivePlayerName} dropped coins: {string.Join(",",coins.Select(c => c.ToString()).ToArray())}. ";
+            this.State = ActionState.EndTurn;
+            await this.EndTurn();
+            return new ActionResponse(true, message, gameObjects, State);
+        }
         internal async Task<ActionResponse> TryBuyCard(int cardId, ColourEnum colour)
         {
             CardLevel cardLevel = this.Board.GetCardLevel(cardId);
             Card card = cardLevel.Exposed.First(x => x.Id == cardId);
-            if (cardLevel==null) return ActionResponse.Nok("Card not found on the board");
+            if (cardLevel == null) return ActionResponse.Nok("Card not found on the board. ");
             var buyCardResponse = await ActivePlayerBoard.BuyCard(card, colour);
             if (!buyCardResponse.Success)
             {
@@ -105,26 +121,26 @@ namespace Splenduel.Core.Game.Model
             cardLevel.TakeCardById(card.Id);
             this.Board.CoinBoard.PutCoinsInTheBag(buyCardResponse.Object as IDictionary<ColourEnum, int>);
             var gameObjects = new List<object> { ActivePlayerBoard, cardLevel };
-            var message = $"{ActivePlayerName} bought card {card.ToString()}";
+            var message = $"{ActivePlayerName} bought card {card.ToString()}. ";
             this.State = ActionState.EndTurn;
             this.EndTurn();
             return new ActionResponse(true, message, gameObjects, ActionState.EndTurn);
         }
         internal async Task<ActionResponse> PlayerExchangesScroll(CoinRequest coinRequest)
         {
-            if (ActivePlayerBoard.ScrollsCount < 1) return ActionResponse.Nok("No scrolls to exchange"); 
+            if (ActivePlayerBoard.ScrollsCount < 1) return ActionResponse.Nok("No scrolls to exchange. ");
             //this has to be here because of not being able to drop the partially changed GameState right now (could be resolved with different approach to persistence)
             var response = this.Board.CoinBoard.ExchangeScroll(coinRequest);
             if (!response.Success) return ActionResponse.Nok(response.Message);
             await ActivePlayerBoard.GetCoinForScroll(coinRequest.colour);
             var gameObjects = new List<object> { ActivePlayerBoard, Board.CoinBoard };
-            var message = $"{ActivePlayerName} exchanged a scroll for a {coinRequest.colour} coin";
+            var message = $"{ActivePlayerName} exchanged a scroll for a {coinRequest.colour} coin. ";
             this.State = ActionState.Normal;
             return new ActionResponse(true, message, gameObjects, ActionState.Normal);
         }
         private async Task EndTurn()
         {
-            this.Player1Turn=!this.Player1Turn;
+            this.Player1Turn = !this.Player1Turn;
         }
 
 
