@@ -15,6 +15,7 @@ namespace Splenduel.Core.Game.Model
         public const string ReserveCard = "reserveCard";
         public const string GetNoble = "getNoble";
         public const string TradeScroll = "tradeScroll";
+        public const string TakeGoldCoin = "takeGoldCoin";
         //public string BuyReservedCard = "buyReservedCard";
     }
 }

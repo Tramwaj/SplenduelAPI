@@ -88,9 +88,9 @@ namespace Splenduel.Core.Game.Model
                 }
                 if (ActivePlayerBoard.CoinsCount <= 10)
                 {
-                    this.State = ActionState.EndTurn;
+                    this.State = ActionState.Normal;
                     await this.EndTurn();
-                    return new ActionResponse(true, msg, objects, this.State);
+                    return new ActionResponse(true, msg, objects, ActionState.EndTurn);
                 }
                 msg += $"{ActivePlayerName} has 10 or more coins and has to drop {ActivePlayerBoard.CoinsCount - 10} of them. ";
                 this.State = ActionState.DropCoins;
@@ -104,23 +104,80 @@ namespace Splenduel.Core.Game.Model
             if (!response.Success) return new ActionResponse(false, response.Message);
             this.Board.CoinBoard.PutCoinsInTheBag(coins);
             var gameObjects = new List<object> { ActivePlayerBoard, Board.CoinBoard };
-            var message = $"{ActivePlayerName} dropped coins: {string.Join(",",coins.Select(c => c.ToString()).ToArray())}. ";
-            this.State = ActionState.EndTurn;
+            var message = $"{ActivePlayerName} dropped coins: {string.Join(",", coins.Select(c => c.ToString()).ToArray())}. ";
+            this.State = ActionState.Normal;
             await this.EndTurn();
-            return new ActionResponse(true, message, gameObjects, State);
+            return new ActionResponse(true, message, gameObjects, ActionState.EndTurn);
         }
         internal async Task<ActionResponse> TryBuyCard(int cardId, ColourEnum colour)
         {
-            CardLevel cardLevel = this.Board.GetCardLevel(cardId);
-            Card card = cardLevel.Exposed.First(x => x.Id == cardId);
-            if (cardLevel == null) return ActionResponse.Nok("Card not found on the board. ");
+            Card? card = null;
+            CardLevel? cardLevel = null;
+            List<object> gameObjects = new();
+            bool CardIsReserved = FindReservedCard(cardId, out card);
+            if (!CardIsReserved)
+            {
+                FindCard(cardId, out cardLevel, out card);
+                if (cardLevel == null) return ActionResponse.Nok("Card not found on the board. ");
+            }
             var buyCardResponse = await ActivePlayerBoard.BuyCard(card, colour);
             if (!buyCardResponse.Success)
             {
                 return new ActionResponse(false, buyCardResponse.Message);
             }
-            cardLevel.TakeCardById(card.Id);
+            if (!CardIsReserved)
+            {
+                cardLevel.TakeCardById(card.Id);
+                gameObjects.Add(cardLevel);
+            }
+            else ActivePlayerBoard.HiddenCards.Remove(card);
+
             this.Board.CoinBoard.PutCoinsInTheBag(buyCardResponse.Object as IDictionary<ColourEnum, int>);
+            gameObjects.Add(ActivePlayerBoard);
+            var message = $"{ActivePlayerName} bought card {card}. ";
+            return new ActionResponse(true, message, gameObjects, returnState);
+        }
+        private void FindCard(int cardId, out CardLevel? cardLevel, out Card? card)
+        {
+            cardLevel = this.Board.GetCardLevel(cardId);
+            card = cardLevel.Exposed.First(x => x.Id == cardId);
+        }
+        private bool FindReservedCard(int cardId, out Card? card)
+        {
+            card = ActivePlayerBoard.HiddenCards.FirstOrDefault(x => x.Id == cardId);
+            if (card is null) return false;
+            return true;
+        }
+
+        internal async Task<ActionResponse> TryReserveCard(int cardId, ColourEnum colour)
+        {
+            Card card;
+            CardLevel cardLevel = null;
+            string message;
+            if (ActivePlayerBoard.HiddenCardsCount >= 3) throw new InvalidOperationException("Player already has 3 hidden cards");
+            if (cardId % 100 != 99)
+            {
+                FindCard(cardId, out cardLevel, out card);
+                if (cardLevel == null) return ActionResponse.Nok("Card not found on the board. ");
+                cardLevel.TakeCardById(card.Id);
+                message = $"{ActivePlayerName} reserved card {card.ToString()}. ";
+            }
+            else
+            {
+                switch (cardId)
+                {
+                    case 99:
+                        cardLevel = this.Board.Level1; break;
+                    case 199:
+                        cardLevel = this.Board.Level2; break;
+                    case 299:
+                        cardLevel = this.Board.Level3; break;
+                }
+                card = cardLevel?.DrawCardFromDeck();
+                if (card is null) return ActionResponse.Nok("No cards left in the deck. ");
+                message = $"{ActivePlayerName} reserved a card from the deck. ";
+            }
+            ActivePlayerBoard.HiddenCards.Add(card);
             var gameObjects = new List<object> { ActivePlayerBoard, cardLevel };
             var message = $"{ActivePlayerName} bought card {card.ToString()}. ";
             this.State = ActionState.EndTurn;

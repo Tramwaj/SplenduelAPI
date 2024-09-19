@@ -187,5 +187,14 @@ namespace Splenduel.Core.Game.Model
                 _coinsInBag.Add(coin);
             }
         }
+
+        internal DefaultResponse TakeGoldCoin(CoinRequest coinRequest)
+        {
+            if (coinRequest.colour != ColourEnum.Gold) return new DefaultResponse(false, "Requested coin is not gold!");
+            if (!AreCoinRequestColoursProper([coinRequest])) return new DefaultResponse(false, "Requested coin colour doesn't match!");
+            if (!AreCoinRequestPositionProper([coinRequest])) return new DefaultResponse(false, "Requested coin position is not proper!");
+            CoinsOnBoard[coinRequest.i][coinRequest.j] = ColourEnum.Grey;
+            return new DefaultResponse(true);
+        }
     }
 }

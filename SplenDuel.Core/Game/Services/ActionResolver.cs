@@ -47,30 +47,45 @@ namespace Splenduel.Core.Game.Services
             switch (action.Type)
             {
                 case PlayerActionNames.GetCoins:
+                    if (gs.State!=ActionState.Normal) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
                     CoinRequestDTO[] coinRequestDTOs = JsonSerializer.Deserialize<CoinRequestDTO[]>(action.Payload.ToString(),jsonOptions);
                     CoinRequest[] coinRequests = coinRequestDTOs.Select(x=>x.CoinRequest()).ToArray();
                     response = await gs.PlayerTakesCoins(coinRequests);
                     break;
                 case PlayerActionNames.DropCoins:
+                    if (gs.State!=ActionState.DropCoins) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
                     ColourEnum[] coins = JsonSerializer.Deserialize<string[]>(action.Payload.ToString(), jsonOptions).Select(c=>Enum.Parse<ColourEnum>(c)).ToArray();
                     response = await gs.PlayerDropsCoins(coins);
                     break;
                 case PlayerActionNames.ShuffleCoins:
+                    if (gs.State!=ActionState.Normal) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
                     response = await gs.PlayerShufflesTheBoard();
                     break;
                 case PlayerActionNames.BuyCard:
-                    BuyCardRequest cardRequest = JsonSerializer.Deserialize<BuyCardRequest>(action.Payload.ToString(),jsonOptions);
+                    if (gs.State!=ActionState.Normal) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
+                    CardRequest cardRequest = JsonSerializer.Deserialize<CardRequest>(action.Payload.ToString(),jsonOptions);
                     ColourEnum colour = Enum.Parse<ColourEnum>(cardRequest.Colour);
                     //Card card = action.Payload as Card;
                     response = await gs.TryBuyCard(cardRequest.CardId, colour);
                     break;
+                case PlayerActionNames.TakeGoldCoin:
+                    if (gs.State!=ActionState.Normal) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
+                    CoinRequestDTO goldCoinRequestDTO = JsonSerializer.Deserialize<CoinRequestDTO>(action.Payload.ToString(), jsonOptions);
+                    CoinRequest goldCoinRequest = goldCoinRequestDTO.CoinRequest();
+                    response = await gs.PlayerTakesGoldCoin(goldCoinRequest);
+                    break;
                 case PlayerActionNames.ReserveCard:
-                    response = await ReserveCard(action, previousGameState, playerName);
+                    if (gs.State!=ActionState.ReserveCard) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
+                    CardRequest reserveCardRequest = JsonSerializer.Deserialize<CardRequest>(action.Payload.ToString(), jsonOptions);
+                    ColourEnum reservedColour = Enum.Parse<ColourEnum>(reserveCardRequest.Colour);
+                    response = await gs.TryReserveCard(reserveCardRequest.CardId, reservedColour);
                     break;
                 case PlayerActionNames.GetNoble:
+                    if (gs.State!=ActionState.GetNoble) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
                     response = await GetNoble(action, previousGameState, playerName);
                     break;
                 case PlayerActionNames.TradeScroll:
+                    if (gs.State!=ActionState.Normal) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
                     CoinRequestDTO coinRequestDTO = JsonSerializer.Deserialize<CoinRequestDTO>(action.Payload.ToString(), jsonOptions);
                     CoinRequest coinRequest = coinRequestDTO.CoinRequest();
                     response = await gs.PlayerExchangesScroll(coinRequest);
