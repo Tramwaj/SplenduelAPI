@@ -33,6 +33,7 @@ namespace Splenduel.Core.Game.Model
             Player1Turn = player1Turn;
             Board = board;
             LastAction = lastAction;
+            State = ActionState.Normal;
         }
         internal async Task<ActionResponse> PlayerShufflesTheBoard()
         {
