@@ -135,8 +135,41 @@ namespace Splenduel.Core.Game.Model
             this.Board.CoinBoard.PutCoinsInTheBag(buyCardResponse.Object as IDictionary<ColourEnum, int>);
             gameObjects.Add(ActivePlayerBoard);
             var message = $"{ActivePlayerName} bought card {card}. ";
+
+            string returnState="";
+            switch (card.Action)
+            {
+                case CardActionEnum.None:
+                    this.State = ActionState.Normal;
+                    returnState = ActionState.EndTurn;
+                    await this.EndTurn();
+                    break;
+                case CardActionEnum.ExtraTurn:
+                    message += $"{ActivePlayerName} gets an extra turn. ";
+                    this.State = ActionState.Normal;
+                    returnState = ActionState.Normal;
+                    break;
+                case CardActionEnum.CoinPickup:
+                    message += $"{ActivePlayerName} can pick up a {colour} coin. ";
+                    this.State = ActionState.Pickup(colour);
+                    returnState = ActionState.Pickup(colour);
+                    break;
+                case CardActionEnum.Steal:
+                    message += $"{ActivePlayerName} can steal a coin from {NotActivePlayerName}. ";
+                    this.State = ActionState.StealCoin;
+                    returnState = ActionState.StealCoin;
+                    break;
+                case CardActionEnum.Scroll:
+                    message += PlayerGetsScroll(true, gameObjects);
+                    this.State = ActionState.Normal;
+                    returnState = ActionState.EndTurn;
+                    break;
+            }
             return new ActionResponse(true, message, gameObjects, returnState);
+
+
         }
+
         private void FindCard(int cardId, out CardLevel? cardLevel, out Card? card)
         {
             cardLevel = this.Board.GetCardLevel(cardId);
@@ -179,9 +212,8 @@ namespace Splenduel.Core.Game.Model
             }
             ActivePlayerBoard.HiddenCards.Add(card);
             var gameObjects = new List<object> { ActivePlayerBoard, cardLevel };
-            var message = $"{ActivePlayerName} bought card {card.ToString()}. ";
-            this.State = ActionState.EndTurn;
-            this.EndTurn();
+            this.State = ActionState.Normal;
+            await this.EndTurn();
             return new ActionResponse(true, message, gameObjects, ActionState.EndTurn);
         }
         internal async Task<ActionResponse> PlayerExchangesScroll(CoinRequest coinRequest)
@@ -217,6 +249,18 @@ namespace Splenduel.Core.Game.Model
                 await this.Board.Player2Board.ClearHiddenCards();
             }
             return this;
+        }
+
+        internal async Task<ActionResponse> PlayerTakesGoldCoin(CoinRequest coinRequest)
+        {
+            if (ActivePlayerBoard.HiddenCardsCount >= 3) return ActionResponse.Nok("Player already has 3 hidden cards");
+            var response = this.Board.CoinBoard.TakeGoldCoin(coinRequest);
+            if (!response.Success) return ActionResponse.Nok(response.Message);
+            await ActivePlayerBoard.AddCoin(ColourEnum.Gold);
+            var gameObjects = new List<object> { ActivePlayerBoard, Board.CoinBoard };
+            var message = $"{ActivePlayerName} took a gold coin. ";
+            this.State = ActionState.ReserveCard;
+            return new ActionResponse(true, message, gameObjects, ActionState.ReserveCard);
         }
     }
 }
