@@ -82,7 +82,7 @@ namespace Splenduel.Core.Game.Services
                     break;
                 case PlayerActionNames.GetNoble:
                     if (gs.State!=ActionState.GetNoble) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
-                    response = await GetNoble(action, previousGameState, playerName);
+                    throw new NotImplementedException();
                     break;
                 case PlayerActionNames.TradeScroll:
                     if (gs.State!=ActionState.Normal) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
@@ -90,7 +90,14 @@ namespace Splenduel.Core.Game.Services
                     CoinRequest coinRequest = coinRequestDTO.CoinRequest();
                     response = await gs.PlayerExchangesScroll(coinRequest);
                     break;
-                default: throw new ApplicationException("Invalid action type");
+                case PlayerActionNames.StealCoin:
+                    if (gs.State!=ActionState.StealCoin) { response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
+ColourEnum colourEnum = Enum.Parse<ColourEnum>(action.Payload.ToString());
+                    response = await gs.PlayerStealsCoin(colourEnum);
+                    break;
+                default:
+                    response = new ActionResponse(false, "Action not found");
+                    break;
             }
             if (!response.Success)
             {

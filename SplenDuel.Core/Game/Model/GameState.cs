@@ -262,5 +262,15 @@ namespace Splenduel.Core.Game.Model
             this.State = ActionState.ReserveCard;
             return new ActionResponse(true, message, gameObjects, ActionState.ReserveCard);
         }
+        internal async Task<ActionResponse> PlayerStealsCoin(ColourEnum colour)
+        {
+            if (NotActivePlayerBoard.Coins[colour]<1) return ActionResponse.Nok("Player has no coins of this colour. ");
+            NotActivePlayerBoard.Coins[colour]--;
+            ActivePlayerBoard.Coins[colour]++;
+            var gameObjects = new List<object> { ActivePlayerBoard, NotActivePlayerBoard };
+            var message = $"{ActivePlayerName} stole a {colour} coin from {NotActivePlayerName}. ";
+            this.State = ActionState.Normal;
+            return new ActionResponse(true, message, gameObjects, ActionState.Normal);
+        }
     }
 }
