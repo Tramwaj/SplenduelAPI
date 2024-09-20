@@ -64,7 +64,7 @@ namespace Splenduel.Core.Game.Model
                 takingPlayerBoard.ScrollsCount++;
                 gameObjects.Add(takingPlayerBoard);
                 gameObjects.Add(otherPlayerBoard);
-                message += $" {takingPlayerBoard.Player.Name} gave a scroll to {otherPlayerBoard.Player.Name}";
+                message += $" {takingPlayerBoard.Player.Name} took a scroll from {otherPlayerBoard.Player.Name}";
             }
             else
             {
@@ -270,7 +270,21 @@ namespace Splenduel.Core.Game.Model
             var gameObjects = new List<object> { ActivePlayerBoard, NotActivePlayerBoard };
             var message = $"{ActivePlayerName} stole a {colour} coin from {NotActivePlayerName}. ";
             this.State = ActionState.Normal;
-            return new ActionResponse(true, message, gameObjects, ActionState.Normal);
+            await EndTurn();
+            return new ActionResponse(true, message, gameObjects, ActionState.EndTurn);
+        }
+
+        internal async Task<ActionResponse> PlayerPicksUpCoin(CoinRequest coin)
+        {
+            if (coin.colour != Enum.Parse<ColourEnum>(State.Split(' ').Last())) return ActionResponse.Nok("Wrong colour. ");
+            var response = this.Board.CoinBoard.TakeCoins([coin]);
+            if (!response.Success) return ActionResponse.Nok(response.Message);
+            await ActivePlayerBoard.AddCoin(coin.colour);
+            var gameObjects = new List<object> { ActivePlayerBoard, Board.CoinBoard };
+            var message = $"{ActivePlayerName} picked up a {coin.colour} coin. ";
+            this.State = ActionState.Normal;
+            await EndTurn();
+            return new ActionResponse(true, message, gameObjects, ActionState.EndTurn);
         }
     }
 }

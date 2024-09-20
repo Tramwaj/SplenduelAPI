@@ -26,7 +26,7 @@ namespace Splenduel.Core.Game.Services
             public int i;
             public int j;
             public string colour;
-            public CoinRequest CoinRequest() => new CoinRequest(i, j, Enum.Parse<ColourEnum>(colour,true));
+            public CoinRequest CoinRequest() => new CoinRequest(i, j, Enum.Parse<ColourEnum>(colour, true));
         }
 
         internal async Task<GameState?> ResolveAction(ActionDTO action, GameState previousGameState, string playerName)
@@ -47,53 +47,59 @@ namespace Splenduel.Core.Game.Services
             switch (action.Type)
             {
                 case PlayerActionNames.GetCoins:
-                    if (gs.State!=ActionState.Normal) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
-                    CoinRequestDTO[] coinRequestDTOs = JsonSerializer.Deserialize<CoinRequestDTO[]>(action.Payload.ToString(),jsonOptions);
-                    CoinRequest[] coinRequests = coinRequestDTOs.Select(x=>x.CoinRequest()).ToArray();
+                    if (gs.State != ActionState.Normal) { response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
+                    CoinRequestDTO[] coinRequestDTOs = JsonSerializer.Deserialize<CoinRequestDTO[]>(action.Payload.ToString(), jsonOptions);
+                    CoinRequest[] coinRequests = coinRequestDTOs.Select(x => x.CoinRequest()).ToArray();
                     response = await gs.PlayerTakesCoins(coinRequests);
                     break;
                 case PlayerActionNames.DropCoins:
-                    if (gs.State!=ActionState.DropCoins) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
-                    ColourEnum[] coins = JsonSerializer.Deserialize<string[]>(action.Payload.ToString(), jsonOptions).Select(c=>Enum.Parse<ColourEnum>(c)).ToArray();
+                    if (gs.State != ActionState.DropCoins) { response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
+                    ColourEnum[] coins = JsonSerializer.Deserialize<string[]>(action.Payload.ToString(), jsonOptions).Select(c => Enum.Parse<ColourEnum>(c)).ToArray();
                     response = await gs.PlayerDropsCoins(coins);
                     break;
                 case PlayerActionNames.ShuffleCoins:
-                    if (gs.State!=ActionState.Normal) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
+                    if (gs.State != ActionState.Normal) { response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
                     response = await gs.PlayerShufflesTheBoard();
                     break;
                 case PlayerActionNames.BuyCard:
-                    if (gs.State!=ActionState.Normal) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
-                    CardRequest cardRequest = JsonSerializer.Deserialize<CardRequest>(action.Payload.ToString(),jsonOptions);
+                    if (gs.State != ActionState.Normal) { response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
+                    CardRequest cardRequest = JsonSerializer.Deserialize<CardRequest>(action.Payload.ToString(), jsonOptions);
                     ColourEnum colour = Enum.Parse<ColourEnum>(cardRequest.Colour);
                     //Card card = action.Payload as Card;
                     response = await gs.TryBuyCard(cardRequest.CardId, colour);
                     break;
                 case PlayerActionNames.TakeGoldCoin:
-                    if (gs.State!=ActionState.Normal) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
+                    if (gs.State != ActionState.Normal) { response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
                     CoinRequestDTO goldCoinRequestDTO = JsonSerializer.Deserialize<CoinRequestDTO>(action.Payload.ToString(), jsonOptions);
                     CoinRequest goldCoinRequest = goldCoinRequestDTO.CoinRequest();
                     response = await gs.PlayerTakesGoldCoin(goldCoinRequest);
                     break;
                 case PlayerActionNames.ReserveCard:
-                    if (gs.State!=ActionState.ReserveCard) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
+                    if (gs.State != ActionState.ReserveCard) { response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
                     CardRequest reserveCardRequest = JsonSerializer.Deserialize<CardRequest>(action.Payload.ToString(), jsonOptions);
                     ColourEnum reservedColour = Enum.Parse<ColourEnum>(reserveCardRequest.Colour);
                     response = await gs.TryReserveCard(reserveCardRequest.CardId, reservedColour);
                     break;
                 case PlayerActionNames.GetNoble:
-                    if (gs.State!=ActionState.GetNoble) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
+                    if (gs.State != ActionState.GetNoble) { response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
                     throw new NotImplementedException();
                     break;
                 case PlayerActionNames.TradeScroll:
-                    if (gs.State!=ActionState.Normal) {response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
+                    if (gs.State != ActionState.Normal) { response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
                     CoinRequestDTO coinRequestDTO = JsonSerializer.Deserialize<CoinRequestDTO>(action.Payload.ToString(), jsonOptions);
                     CoinRequest coinRequest = coinRequestDTO.CoinRequest();
                     response = await gs.PlayerExchangesScroll(coinRequest);
                     break;
                 case PlayerActionNames.StealCoin:
-                    if (gs.State!=ActionState.StealCoin) { response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
-ColourEnum colourEnum = Enum.Parse<ColourEnum>(action.Payload.ToString());
+                    if (gs.State != ActionState.StealCoin) { response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
+                    ColourEnum colourEnum = Enum.Parse<ColourEnum>(action.Payload.ToString());
                     response = await gs.PlayerStealsCoin(colourEnum);
+                    break;
+                case PlayerActionNames.PickupCoin:
+                    if (gs.State != ActionState.Normal) { response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
+                    var coinDTO = JsonSerializer.Deserialize<CoinRequestDTO>(action.Payload.ToString(), jsonOptions);
+                    var coin = coinDTO.CoinRequest();
+                    response = await gs.PlayerPicksUpCoin(coin);
                     break;
                 default:
                     response = new ActionResponse(false, "Action not found");
@@ -105,13 +111,13 @@ ColourEnum colourEnum = Enum.Parse<ColourEnum>(action.Payload.ToString());
                 return null;
             }
             await SendMessages(response, gs.GameId);
-            
+
             return gs;
         }
 
         private async Task SendMessages(ActionResponse response, Guid gameId)
         {
-            
+
             foreach (var obj in response.ChangedObjects)
             {
                 if (obj is CoinBoard cb) await _hub.SendCoinBoard(cb.MapToVM(), gameId.ToString());

@@ -17,6 +17,7 @@ namespace Splenduel.Core.Game.Model
         public const string TradeScroll = "tradeScroll";
         public const string TakeGoldCoin = "takeGoldCoin";
         public const string StealCoin = "stealCoin";
+        public const string PickupCoin = "pickupCoin";
         //public string BuyReservedCard = "buyReservedCard";
     }
 }
