@@ -96,7 +96,7 @@ namespace Splenduel.Core.Game.Services
                     response = await gs.PlayerStealsCoin(colourEnum);
                     break;
                 case PlayerActionNames.PickupCoin:
-                    if (gs.State != ActionState.Normal) { response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
+                    if (!gs.State.Contains("Pickup")) { response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
                     var coinDTO = JsonSerializer.Deserialize<CoinRequestDTO>(action.Payload.ToString(), jsonOptions);
                     var coin = coinDTO.CoinRequest();
                     response = await gs.PlayerPicksUpCoin(coin);

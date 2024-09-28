@@ -32,7 +32,7 @@ namespace SplenDuelCoreTests
                 Assert.That(cardFromCsv.Cost.Red, Is.EqualTo(2));
                 Assert.That(cardFromCsv.Cost.Black, Is.EqualTo(2));
                 Assert.That(cardFromCsv.Cost.Pink, Is.EqualTo(0));
-                Assert.That(cardFromCsv.Action, Is.EqualTo(CardActionEnum.CoinPickup));
+                Assert.That(cardFromCsv.Action, Is.EqualTo(CardActionEnum.Pickup));
             });
         }
         [Test]

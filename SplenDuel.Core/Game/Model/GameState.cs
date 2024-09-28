@@ -82,19 +82,20 @@ namespace Splenduel.Core.Game.Model
                 //todo: check for coins over 10
                 var msg = $"{ActivePlayerName} took coins: {coinsInfo}. ";
                 var objects = new List<object> { ActivePlayerBoard, Board.CoinBoard };
-                if (request.Count(x => x.colour == ColourEnum.Pink) == 2 || request.Select(x => x.colour).Distinct().Count() == 1)
+                if (request.Count(x => x.colour == ColourEnum.Pink) == 2 || (request.Count()==3 && request.Select(x => x.colour).Distinct().Count() == 1))
                 {
                     msg += PlayerGetsScroll(false, objects);
                 }
-                if (ActivePlayerBoard.CoinsCount <= 10)
+                if (ActivePlayerBoard.CoinsCount > 10)
                 {
-                    this.State = ActionState.Normal;
-                    await this.EndTurn();
-                    return new ActionResponse(true, msg, objects, ActionState.EndTurn);
+                    msg += $"{ActivePlayerName} has 10 or more coins and has to drop {ActivePlayerBoard.CoinsCount - 10} of them. ";
+                    this.State = ActionState.DropCoins;
+                    return new ActionResponse(true, msg, objects, this.State);
                 }
-                msg += $"{ActivePlayerName} has 10 or more coins and has to drop {ActivePlayerBoard.CoinsCount - 10} of them. ";
-                this.State = ActionState.DropCoins;
-                return new ActionResponse(true, msg, objects, this.State);
+                
+                this.State = ActionState.Normal;
+                await this.EndTurn();
+                return new ActionResponse(true, msg, objects, ActionState.EndTurn);
             }
             return new ActionResponse(false, response.Message);
         }
@@ -149,7 +150,14 @@ namespace Splenduel.Core.Game.Model
                     this.State = ActionState.Normal;
                     returnState = ActionState.Normal;
                     break;
-                case CardActionEnum.CoinPickup:
+                case CardActionEnum.Pickup:
+                    if (!Board.CoinBoard.CoinsOnBoard.Any(row=>row.Any(coin=>coin== colour)))
+                    {
+                        message += $"{ActivePlayerName} can't pick up a {colour} coin. ";
+                        this.State = ActionState.Normal;
+                        returnState = ActionState.EndTurn;
+                        break;
+                    }
                     message += $"{ActivePlayerName} can pick up a {colour} coin. ";
                     this.State = ActionState.Pickup(colour);
                     returnState = ActionState.Pickup(colour);
@@ -163,6 +171,7 @@ namespace Splenduel.Core.Game.Model
                     message += PlayerGetsScroll(true, gameObjects);
                     this.State = ActionState.Normal;
                     returnState = ActionState.EndTurn;
+                    await this.EndTurn();
                     break;
             }
             return new ActionResponse(true, message, gameObjects, returnState);
