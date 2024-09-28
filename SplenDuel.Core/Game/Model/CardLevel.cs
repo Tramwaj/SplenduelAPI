@@ -44,7 +44,7 @@ namespace Splenduel.Core.Game.Model
         //todo: tests
         public Card? DrawCardFromDeck()
         {
-            if (_deck.Count == 0) return null;
+            if (_deck.Count == 0) return new Card();
             var cardDrawn = _deck.ElementAt(_random.Next(_deck.Count));
             _deck.Remove(cardDrawn);
             return cardDrawn;
