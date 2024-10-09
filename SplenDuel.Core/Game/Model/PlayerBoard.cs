@@ -22,6 +22,7 @@ namespace Splenduel.Core.Game.Model
         public int HiddenCardsCount => HiddenCards.Count();
 
         public Player Player { get; set; }
+        public int NoblesTaken { get; set; } = 0;
 
 
         public PlayerBoard() { }
@@ -138,7 +139,7 @@ namespace Splenduel.Core.Game.Model
             this.PointsByColour = this.PointsByColour.CreateOrAddIfExists(card.Colour, card.Points);
         }
 
-        private bool IsWinConditionFullfilled()
+        internal bool IsWinConditionFullfilled()
         {
             if (this.Crowns >= 10) return true;
             if (this.TotalPoints >= 20) return true;
@@ -163,6 +164,11 @@ namespace Splenduel.Core.Game.Model
         public async Task ClearHiddenCards()
         {
             this.HiddenCards.Clear();
+        }
+        public async Task GetNoble(Noble noble)
+        {
+            this.PointsByColour.CreateOrAddIfExists(ColourEnum.Gold, noble.Points);
+            this.NoblesTaken++;
         }
     }
 }

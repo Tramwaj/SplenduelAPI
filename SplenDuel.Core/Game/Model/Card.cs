@@ -24,7 +24,7 @@ namespace Splenduel.Core.Game.Model
         {
             return new Card(this.Id, this.Level, this.Colour, this.Points, this.MiningPower, this.Crowns, this.Cost, this.Action);
         }
-        static Card Blank()
+        public static Card Blank()
         {
             return new Card(0,0, ColourEnum.Grey, 0, 0, 0, null);
 

@@ -29,7 +29,8 @@ namespace Splenduel.Core.Mappers
                 Level3 = board.Level3.MapToVM(),
                 CoinBoard = board.CoinBoard.MapToVM(),
                 Player1Board = board.Player1Board.MapToVM(),
-                Player2Board = board.Player2Board.MapToVM()
+                Player2Board = board.Player2Board.MapToVM(),
+                Nobles = board.Nobles.Select(n => n.MapToVM()).ToArray()
             };
         }
         public static CardLevelVM MapToVM(this Splenduel.Core.Game.Model.CardLevel cardLevel)
@@ -85,6 +86,15 @@ namespace Splenduel.Core.Mappers
             {
                 Name = player.Name,
                 Id = player.Id
+            };
+        }
+        public static NobleVM MapToVM(this Splenduel.Core.Game.Model.Noble noble)
+        {
+            if (noble == null) return null;
+            return new NobleVM
+            {
+                Points = noble.Points,
+                Action = noble.Action.ToString()
             };
         }
     }

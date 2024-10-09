@@ -19,6 +19,7 @@ namespace Splenduel.Interfaces.VMs
         public CoinBoardVM CoinBoard { get; set; }
         public PlayerBoardVM Player1Board { get; set; }
         public PlayerBoardVM Player2Board { get; set; }
+        public NobleVM[] Nobles { get; set; }
 
     }
     public class PlayerVM
@@ -73,6 +74,12 @@ namespace Splenduel.Interfaces.VMs
         public Dictionary<string, int> MiningValues { get; set; }
         public Dictionary<string, int> Coins { get; set; }
         public int HiddenCardsCount { get; set; }
+
+    }
+    public class NobleVM
+    {
+        public int Points { get; set; }
+        public string Action { get; set; }
 
     }
 }

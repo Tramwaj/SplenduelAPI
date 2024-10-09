@@ -80,10 +80,6 @@ namespace Splenduel.Core.Game.Services
                     ColourEnum reservedColour = Enum.Parse<ColourEnum>(reserveCardRequest.Colour);
                     response = await gs.TryReserveCard(reserveCardRequest.CardId, reservedColour);
                     break;
-                case PlayerActionNames.GetNoble:
-                    if (gs.State != ActionState.GetNoble) { response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
-                    throw new NotImplementedException();
-                    break;
                 case PlayerActionNames.TradeScroll:
                     if (gs.State != ActionState.Normal) { response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
                     CoinRequestDTO coinRequestDTO = JsonSerializer.Deserialize<CoinRequestDTO>(action.Payload.ToString(), jsonOptions);
@@ -101,6 +97,11 @@ namespace Splenduel.Core.Game.Services
                     var coin = coinDTO.CoinRequest();
                     response = await gs.PlayerPicksUpCoin(coin);
                     break;
+                case PlayerActionNames.GetNoble:
+                    if (gs.State != ActionState.GetNoble) { response = new ActionResponse(false, $"Not the right state: {action.Type} on  {gs.State}"); break; }
+                    int nobleChosen = int.Parse(action.Payload.ToString());
+                    response = await gs.PlayerGetsNoble(nobleChosen);
+                    break;
                 default:
                     response = new ActionResponse(false, "Action not found");
                     break;
@@ -109,6 +110,10 @@ namespace Splenduel.Core.Game.Services
             {
                 await _hub.SendActionStatus(gs.GameId.ToString(), response.State, response.Message);
                 return null;
+            }
+            if (response.State == ActionState.EndTurn.ToString())
+            {
+                response = await gs.ModifyResponseIfMilestoneAchieved(response);
             }
             await SendMessages(response, gs.GameId);
 
@@ -127,6 +132,7 @@ namespace Splenduel.Core.Game.Services
                     int level = cl.Exposed.First().Id / 100;
                     await _hub.SendCardLevel(cl.MapToVM(), level, gameId.ToString());
                 }
+                if (obj is Noble[] nobles) await _hub.SendNobles(nobles.Select(n => n.MapToVM()).ToArray(), gameId.ToString());
                 //if (obj is CardBoard
                 //int (obj is bool )
             }
@@ -145,42 +151,6 @@ namespace Splenduel.Core.Game.Services
                 gs.LastAction = $"{playerName} took coins";
             }
             else gs.LastAction = $"{playerName} did not take coins";
-            throw new NotImplementedException();
-        }
-
-        private async Task<ActionResponse> DropCoins(ActionDTO action, GameState gs, string playerName)
-        {
-            //if (action.Payload[0] is List<ColourEnum> coins)
-            //{
-            //    var dropCoinsResponse = await gs.CurrentPlayerBoard.DropCoins(coins);
-            //    if (dropCoinsResponse.Success)
-            //    {
-            //        gs.LastAction += $"{playerName} dropped coins";
-            //        return gs;
-            //    }
-            //    else throw new ArgumentException(dropCoinsResponse.Error);
-            //}
-            //else 
-            throw new ArgumentException("Parameters should be a list of ColourEnum");
-        }
-
-        private async Task<ActionResponse> BuyCard(ActionDTO action, GameState previousGameState, string playerName)
-        {
-            throw new NotImplementedException();
-        }
-
-        private async Task<ActionResponse> ReserveCard(ActionDTO action, GameState previousGameState, string playerName)
-        {
-            throw new NotImplementedException();
-        }
-
-        private async Task<ActionResponse> GetNoble(ActionDTO action, GameState previousGameState, string playerName)
-        {
-            throw new NotImplementedException();
-        }
-
-        private async Task<ActionResponse> TradeScroll(ActionDTO action, GameState previousGameState, string playerName)
-        {
             throw new NotImplementedException();
         }
     }

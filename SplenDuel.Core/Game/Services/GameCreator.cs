@@ -62,7 +62,11 @@ namespace Splenduel.Core.Game.Services
                 var coinBoard = new CoinBoard(2);
                 var player1Board = new PlayerBoard(false);
                 var player2Board = new PlayerBoard(true);
-                return new Board(cardLevel1, cardLevel2, cardLevel3, coinBoard, player1Board, player2Board);
+                Noble[] nobles = [new Noble(2, CardActionEnum.Scroll), 
+                    new Noble(2, CardActionEnum.ExtraTurn), 
+                    new Noble(2, CardActionEnum.Steal), 
+                    new Noble(3, CardActionEnum.None)];
+                return new Board(cardLevel1, cardLevel2, cardLevel3, coinBoard, player1Board, player2Board, nobles);
             }
             catch
             {

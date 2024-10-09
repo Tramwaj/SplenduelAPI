@@ -3,6 +3,7 @@ using Splenduel.Core.Game.Model.ViewModels;
 using Splenduel.Interfaces.DTOs;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -82,7 +83,7 @@ namespace Splenduel.Core.Game.Model
                 //todo: check for coins over 10
                 var msg = $"{ActivePlayerName} took coins: {coinsInfo}. ";
                 var objects = new List<object> { ActivePlayerBoard, Board.CoinBoard };
-                if (request.Count(x => x.colour == ColourEnum.Pink) == 2 || (request.Count()==3 && request.Select(x => x.colour).Distinct().Count() == 1))
+                if (request.Count(x => x.colour == ColourEnum.Pink) == 2 || (request.Count() == 3 && request.Select(x => x.colour).Distinct().Count() == 1))
                 {
                     msg += PlayerGetsScroll(false, objects);
                 }
@@ -92,7 +93,7 @@ namespace Splenduel.Core.Game.Model
                     this.State = ActionState.DropCoins;
                     return new ActionResponse(true, msg, objects, this.State);
                 }
-                
+
                 this.State = ActionState.Normal;
                 await this.EndTurn();
                 return new ActionResponse(true, msg, objects, ActionState.EndTurn);
@@ -136,47 +137,49 @@ namespace Splenduel.Core.Game.Model
             this.Board.CoinBoard.PutCoinsInTheBag(buyCardResponse.Object as IDictionary<ColourEnum, int>);
             gameObjects.Add(ActivePlayerBoard);
             var message = $"{ActivePlayerName} bought card {card}. ";
-
-            string returnState="";
-            switch (card.Action)
+            string returnState = "";
+            var response = new ActionResponse(true, message, gameObjects);
+            return await ModifyResponseByCardAction(response, card.Action, card.Colour);
+        }
+        private async Task<ActionResponse> ModifyResponseByCardAction(ActionResponse response,CardActionEnum action, ColourEnum colour=ColourEnum.Grey)
+        {
+            switch (action)
             {
                 case CardActionEnum.None:
                     this.State = ActionState.Normal;
-                    returnState = ActionState.EndTurn;
+                    response.State = ActionState.EndTurn;
                     await this.EndTurn();
                     break;
                 case CardActionEnum.ExtraTurn:
-                    message += $"{ActivePlayerName} gets an extra turn. ";
+                    response.Message += $"{ActivePlayerName} gets an extra turn. ";
                     this.State = ActionState.Normal;
-                    returnState = ActionState.Normal;
+                    response.State = ActionState.Normal;
                     break;
                 case CardActionEnum.Pickup:
-                    if (!Board.CoinBoard.CoinsOnBoard.Any(row=>row.Any(coin=>coin== colour)))
+                    if (!Board.CoinBoard.CoinsOnBoard.Any(row => row.Any(coin => coin == colour)))
                     {
-                        message += $"{ActivePlayerName} can't pick up a {colour} coin. ";
+                        response.Message += $"{ActivePlayerName} can't pick up a {colour} coin. ";
                         this.State = ActionState.Normal;
-                        returnState = ActionState.EndTurn;
+                        response.State = ActionState.EndTurn;
                         break;
                     }
-                    message += $"{ActivePlayerName} can pick up a {colour} coin. ";
+                    response.Message += $"{ActivePlayerName} can pick up a {colour} coin. ";
                     this.State = ActionState.Pickup(colour);
-                    returnState = ActionState.Pickup(colour);
+                    response.State = ActionState.Pickup(colour);
                     break;
                 case CardActionEnum.Steal:
-                    message += $"{ActivePlayerName} can steal a coin from {NotActivePlayerName}. ";
+                    response.Message += $"{ActivePlayerName} can steal a coin from {NotActivePlayerName}. ";
                     this.State = ActionState.StealCoin;
-                    returnState = ActionState.StealCoin;
+                    response.State = ActionState.StealCoin;
                     break;
                 case CardActionEnum.Scroll:
-                    message += PlayerGetsScroll(true, gameObjects);
+                    response.Message += PlayerGetsScroll(true, response.ChangedObjects);
                     this.State = ActionState.Normal;
-                    returnState = ActionState.EndTurn;
+                    response.State = ActionState.EndTurn;
                     await this.EndTurn();
                     break;
             }
-            return new ActionResponse(true, message, gameObjects, returnState);
-
-
+            return response;
         }
 
         private void FindCard(int cardId, out CardLevel? cardLevel, out Card? card)
@@ -273,7 +276,7 @@ namespace Splenduel.Core.Game.Model
         }
         internal async Task<ActionResponse> PlayerStealsCoin(ColourEnum colour)
         {
-            if (NotActivePlayerBoard.Coins[colour]<1) return ActionResponse.Nok("Player has no coins of this colour. ");
+            if (NotActivePlayerBoard.Coins[colour] < 1) return ActionResponse.Nok("Player has no coins of this colour. ");
             NotActivePlayerBoard.Coins[colour]--;
             ActivePlayerBoard.Coins[colour]++;
             var gameObjects = new List<object> { ActivePlayerBoard, NotActivePlayerBoard };
@@ -294,6 +297,50 @@ namespace Splenduel.Core.Game.Model
             this.State = ActionState.Normal;
             await EndTurn();
             return new ActionResponse(true, message, gameObjects, ActionState.EndTurn);
+        }
+        internal async Task<ActionResponse> ModifyResponseIfMilestoneAchieved(ActionResponse response)
+        {
+            if (Board.Player1Board.IsWinConditionFullfilled())
+            {
+                response.Message += "\n Player 1 wins!";
+                response.State = ActionState.Player1Win;
+                return response;
+            }
+            if (Board.Player2Board.IsWinConditionFullfilled())
+            {
+                response.Message += "\n Player 2 wins!";
+                response.State = ActionState.Player2Win;
+                return response;
+            }
+            if (NotActivePlayerBoard.Crowns >= 3 && NotActivePlayerBoard.NoblesTaken == 0)
+            {
+                await EndTurn();
+                response.Message += $"{ActivePlayerName} gets to choose a noble. ";
+                this.State = ActionState.GetNoble;
+                response.State = ActionState.GetNoble;
+                return response;
+            }
+            if (NotActivePlayerBoard.Crowns >= 6 && NotActivePlayerBoard.NoblesTaken == 1)
+            {
+                await EndTurn();
+                response.Message += $"{ActivePlayerName} gets to choose a noble. ";
+                this.State = ActionState.GetNoble;
+                response.State = ActionState.GetNoble;
+                return response;
+            }
+            return response;
+        }
+
+        internal async Task<ActionResponse> PlayerGetsNoble(int nobleChosen)
+        {
+            if (Board.Nobles[nobleChosen]==null) return ActionResponse.Nok("Noble already taken. ");
+            var noble = Board.Nobles[nobleChosen];
+            await ActivePlayerBoard.GetNoble(noble);
+            var gameObjects = new List<object> { ActivePlayerBoard, Board.Nobles };
+            var response = new ActionResponse(true, $"{ActivePlayerName} took noble {noble}. ",gameObjects);
+            response = await ModifyResponseByCardAction(response, noble.Action);
+            Board.Nobles[nobleChosen] = null;
+            return response;
         }
     }
 }
