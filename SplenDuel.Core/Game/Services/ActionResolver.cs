@@ -115,6 +115,7 @@ namespace Splenduel.Core.Game.Services
             {
                 response = await gs.ModifyResponseIfMilestoneAchieved(response);
             }
+            gs.AddMessage(response.Message);
             await SendMessages(response, gs.GameId);
 
             return gs;

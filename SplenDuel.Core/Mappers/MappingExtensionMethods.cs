@@ -17,7 +17,8 @@ namespace Splenduel.Core.Mappers
                 Player1Turn = gameState.Player1Turn,
                 Board = gameState.Board.MapToVM(),
                 LastAction = gameState.LastAction,
-                ActionState = gameState.State
+                ActionState = gameState.State,
+                Actions = gameState.Actions
             };
         }
         public static BoardVM MapToVM(this Splenduel.Core.Game.Model.Board board)

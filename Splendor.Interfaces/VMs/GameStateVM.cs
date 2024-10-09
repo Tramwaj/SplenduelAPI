@@ -9,6 +9,7 @@ namespace Splenduel.Interfaces.VMs
         public BoardVM Board { get; set; }
         public string LastAction { get; set; }
         public string ActionState { get; set; }
+        public List<string> Actions { get; set; }
 
     }
     public class BoardVM
