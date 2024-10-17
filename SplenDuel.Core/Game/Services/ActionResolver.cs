@@ -111,7 +111,7 @@ namespace Splenduel.Core.Game.Services
                 await _hub.SendActionStatus(gs.GameId.ToString(), response.State, response.Message);
                 return null;
             }
-            if (response.State == ActionState.EndTurn.ToString())
+            if (response.ChangedObjects.Any(obj=> obj is bool))
             {
                 response = await gs.ModifyResponseIfMilestoneAchieved(response);
             }
@@ -128,6 +128,7 @@ namespace Splenduel.Core.Game.Services
             {
                 if (obj is CoinBoard cb) await _hub.SendCoinBoard(cb.MapToVM(), gameId.ToString());
                 if (obj is PlayerBoard pb) await _hub.SendPlayerBoard(pb.MapToVM(), gameId.ToString());
+                if (obj is bool player1Turn) await _hub.SendPlayerTurnMessage(player1Turn, gameId.ToString());
                 if (obj is CardLevel cl)
                 {
                     int level = cl.Exposed.First().Id / 100;

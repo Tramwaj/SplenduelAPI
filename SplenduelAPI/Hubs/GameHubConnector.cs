@@ -27,6 +27,10 @@ namespace SplenduelAPI.Hubs
         {
             await _hubContext.Clients.Group(gameId).SendAsync("ReceiveCardLevel", cardLevel, level);
         }
+        public async Task SendNobles(NobleVM[] nobles, string gameId)
+        {
+            await _hubContext.Clients.Group(gameId).SendAsync("ReceiveNobles", nobles);
+        }
 
         public async Task SendEndTurnMessage(string gameId)
         {
@@ -39,6 +43,10 @@ namespace SplenduelAPI.Hubs
         public async Task SendPersonalActionStatus(string name, string status, string message)
         {
             await _hubContext.Clients.User(name).SendAsync("ReceivePersonalActionStatus", status, message);
+        }
+        public async Task SendPlayerTurnMessage(bool player1Turn, string gameId)
+        {
+            await _hubContext.Clients.Group(gameId).SendAsync("ReceivePlayerTurn", player1Turn);
         }
     }
 }

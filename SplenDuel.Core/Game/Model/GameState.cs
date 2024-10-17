@@ -98,7 +98,8 @@ namespace Splenduel.Core.Game.Model
 
                 this.State = ActionState.Normal;
                 await this.EndTurn();
-                return new ActionResponse(true, msg, objects, ActionState.EndTurn);
+                objects.Add(this.Player1Turn);
+                return new ActionResponse(true, msg, objects, this.State);
             }
             return new ActionResponse(false, response.Message);
         }
@@ -111,7 +112,8 @@ namespace Splenduel.Core.Game.Model
             var message = $"{ActivePlayerName} dropped coins: {string.Join(",", coins.Select(c => c.ToString()).ToArray())}. ";
             this.State = ActionState.Normal;
             await this.EndTurn();
-            return new ActionResponse(true, message, gameObjects, ActionState.EndTurn);
+            gameObjects.Add(this.Player1Turn);
+            return new ActionResponse(true, message, gameObjects, this.State);
         }
         internal async Task<ActionResponse> TryBuyCard(int cardId, ColourEnum colour)
         {
@@ -148,9 +150,9 @@ namespace Splenduel.Core.Game.Model
             switch (action)
             {
                 case CardActionEnum.None:
-                    this.State = ActionState.Normal;
-                    response.State = ActionState.EndTurn;
                     await this.EndTurn();
+                    this.State = response.State = ActionState.Normal;
+                    response.ChangedObjects.Add(this.Player1Turn);
                     break;
                 case CardActionEnum.ExtraTurn:
                     response.Message += $"{ActivePlayerName} gets an extra turn. ";
@@ -161,8 +163,9 @@ namespace Splenduel.Core.Game.Model
                     if (!Board.CoinBoard.CoinsOnBoard.Any(row => row.Any(coin => coin == colour)))
                     {
                         response.Message += $"{ActivePlayerName} can't pick up a {colour} coin. ";
-                        this.State = ActionState.Normal;
-                        response.State = ActionState.EndTurn;
+                        await this.EndTurn();
+                        this.State = response.State = ActionState.Normal;
+                        response.ChangedObjects.Add(this.Player1Turn);
                         break;
                     }
                     response.Message += $"{ActivePlayerName} can pick up a {colour} coin. ";
@@ -176,9 +179,9 @@ namespace Splenduel.Core.Game.Model
                     break;
                 case CardActionEnum.Scroll:
                     response.Message += PlayerGetsScroll(true, response.ChangedObjects);
-                    this.State = ActionState.Normal;
-                    response.State = ActionState.EndTurn;
                     await this.EndTurn();
+                    this.State = response.State = ActionState.Normal;
+                    response.ChangedObjects.Add(this.Player1Turn);
                     break;
             }
             return response;
@@ -228,7 +231,8 @@ namespace Splenduel.Core.Game.Model
             var gameObjects = new List<object> { ActivePlayerBoard, cardLevel };
             this.State = ActionState.Normal;
             await this.EndTurn();
-            return new ActionResponse(true, message, gameObjects, ActionState.EndTurn);
+            gameObjects.Add(this.Player1Turn);
+            return new ActionResponse(true, message, gameObjects, this.State);
         }
         internal async Task<ActionResponse> PlayerExchangesScroll(CoinRequest coinRequest)
         {
@@ -285,7 +289,8 @@ namespace Splenduel.Core.Game.Model
             var message = $"{ActivePlayerName} stole a {colour} coin from {NotActivePlayerName}. ";
             this.State = ActionState.Normal;
             await EndTurn();
-            return new ActionResponse(true, message, gameObjects, ActionState.EndTurn);
+            gameObjects.Add(this.Player1Turn);
+            return new ActionResponse(true, message, gameObjects, this.State);
         }
 
         internal async Task<ActionResponse> PlayerPicksUpCoin(CoinRequest coin)
@@ -298,7 +303,8 @@ namespace Splenduel.Core.Game.Model
             var message = $"{ActivePlayerName} picked up a {coin.colour} coin. ";
             this.State = ActionState.Normal;
             await EndTurn();
-            return new ActionResponse(true, message, gameObjects, ActionState.EndTurn);
+            gameObjects.Add(this.Player1Turn);
+            return new ActionResponse(true, message, gameObjects, this.State);
         }
         internal async Task<ActionResponse> ModifyResponseIfMilestoneAchieved(ActionResponse response)
         {
