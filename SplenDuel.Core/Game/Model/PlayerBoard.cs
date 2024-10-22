@@ -163,7 +163,7 @@ namespace Splenduel.Core.Game.Model
         }
         public async Task ClearHiddenCards()
         {
-            this.HiddenCards.Clear();
+            //this.HiddenCards.Clear();
         }
         public async Task GetNoble(Noble noble)
         {
