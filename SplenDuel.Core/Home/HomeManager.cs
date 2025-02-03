@@ -1,4 +1,6 @@
-﻿using Splenduel.Core.Global;
+﻿using Splenduel.Core.Auth.Store;
+using Splenduel.Core.Game.Model;
+using Splenduel.Core.Global;
 using Splenduel.Core.Home.Interfaces;
 using Splenduel.Core.Home.Model;
 using Splenduel.Core.Home.Store;
@@ -13,10 +15,12 @@ namespace Splenduel.Core.Home
     public class HomeManager : IHomeManager
     {
         private IHomeStore _homeStore;
+        private IUserStore _userStore;
 
-        public HomeManager(IHomeStore homeStore)
+        public HomeManager(IHomeStore homeStore, IUserStore userStore)
         {
             _homeStore = homeStore;
+            _userStore = userStore;
         }
 
         public async Task<DefaultResponse> CreateGameInvite(string inviter, string invitee, bool inviteeStarts)
@@ -65,6 +69,7 @@ namespace Splenduel.Core.Home
             var matches = await _homeStore.GetMatches(user);
             vm.CurrentDuels = matches.Where(x => x.EndTime == null).ToList();
             vm.PastDuels = matches.Where(x => x.EndTime != null).ToList();
+            vm.Players = (await _userStore.GetUsers()).Select(x=>new Player(x.UserName, x.Id)).ToList();
             return vm;
         }
         

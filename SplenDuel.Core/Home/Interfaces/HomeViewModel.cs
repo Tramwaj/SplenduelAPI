@@ -1,4 +1,5 @@
-﻿using Splenduel.Core.Home.Model;
+﻿using Splenduel.Core.Game.Model;
+using Splenduel.Core.Home.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,5 +15,6 @@ namespace Splenduel.Core.Home.Interfaces
         public ICollection<GameInvite> Invites { get; set; }
         public ICollection<Model.Duel> CurrentDuels { get; set; }
         public ICollection<Model.Duel> PastDuels { get; set; }
+        public ICollection<Player> Players { get; set; }
     }
 }
