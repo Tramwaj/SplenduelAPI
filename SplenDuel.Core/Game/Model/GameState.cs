@@ -1,16 +1,4 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using Splenduel.Core.Game.Model.ViewModels;
-using Splenduel.Interfaces.DTOs;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Splenduel.Core.Game.Model
+﻿namespace Splenduel.Core.Game.Model
 {
     public class GameState
     {
@@ -20,6 +8,7 @@ namespace Splenduel.Core.Game.Model
         public Board Board { get; set; }
         public string LastAction { get; set; }
         public List<string> Actions { get; set; } = new();
+        public int TurnNumber = 0;
         public string ActivePlayerName => Player1Turn ? Board.Player1Board.Player.Name : Board.Player2Board.Player.Name;
 
         public string NotActivePlayerName => Player1Turn ? Board.Player2Board.Player.Name : Board.Player1Board.Player.Name;
@@ -248,6 +237,7 @@ namespace Splenduel.Core.Game.Model
         }
         private async Task EndTurn()
         {
+             if (!this.Player1Turn) this.TurnNumber++;
             this.Player1Turn = !this.Player1Turn;
         }
 
